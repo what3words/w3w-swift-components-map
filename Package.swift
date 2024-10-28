@@ -4,20 +4,29 @@
 import PackageDescription
 
 let package = Package(
-    name: "w3w-swift-components-map",
-    products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
-        .library(
-            name: "w3w-swift-components-map",
-            targets: ["w3w-swift-components-map"]),
-    ],
-    targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
-        .target(
-            name: "w3w-swift-components-map"),
-        .testTarget(
-            name: "w3w-swift-components-mapTests",
-            dependencies: ["w3w-swift-components-map"]),
-    ]
+  // or maybe this is called: w3w-swift-presenters-map
+  name: "w3w-swift-components-map",
+  
+  platforms: [.iOS(.v13)],
+  
+  products: [
+    .library(name: "W3WSwiftComponentsMap", targets: ["W3WSwiftComponentsMap"]),
+  ],
+  
+  dependencies: [
+    .package(url: "https://github.com/what3words/w3w-swift-themes.git", "1.0.0"..<"2.0.0"),
+    .package(url: "https://github.com/what3words/w3w-swift-components.git", "3.0.0"..<"4.0.0"),
+    .package(url: "https://github.com/what3words/w3w-swift-design.git", "1.0.0"..<"2.0.0"),
+    .package(url: "https://github.com/what3words/w3w-swift-core.git", "1.0.0"..<"2.0.0")
+  ],
+  
+  targets: [
+    .target(name: "W3WSwiftComponentsMap", dependencies: [
+      .product(name: "W3WSwiftCore", package: "w3w-swift-core"),
+      .product(name: "W3WSwiftDesign", package: "w3w-swift-design"),
+      .product(name: "W3WSwiftComponents", package: "w3w-swift-components"),
+      .product(name: "W3WSwiftThemes", package: "w3w-swift-themes")
+    ]),
+    .testTarget(name: "w3w-swift-components-mapTests", dependencies: ["W3WSwiftComponentsMap"]),
+  ]
 )
