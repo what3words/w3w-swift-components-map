@@ -8,7 +8,7 @@
 import MapKit
 import W3WSwiftCore
 import W3WSwiftDesign
-import W3WSwiftComponents
+
 
 #if canImport(W3WSwiftCoreSdk)
 import W3WSwiftCoreSdk
@@ -22,7 +22,7 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   
   public var viewModel: W3WMapViewModelProtocol
   
-  public lazy var mapView = W3WMapView(frame: .w3wWhatever, w3w: viewModel.w3w)
+  public lazy var mapView = MKMapView() // W3WMapView(frame: .w3wWhatever, w3w: viewModel.w3w)
 
   public var types: [W3WMapType] { get { return [.standard, .satellite, .hybrid, "satelliteFlyover", "hybridFlyover", "mutedStandard"] } }
 
@@ -74,7 +74,7 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   
   
   func handle(selected: W3WSquare?) {
-    mapView.addMarker(at: selected)
+    //mapView.addMarker(at: selected)
   }
   
   

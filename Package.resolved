@@ -1,15 +1,6 @@
 {
-  "originHash" : "2f3869448fe6ebbf3bd3fcdafae5823484fb4a8e3bc57ba92fbcd3edbf22dba8",
+  "originHash" : "9e71897b2acfdca861b361cb383214c0b8cc223844b4c9f4d2278d4412453cb8",
   "pins" : [
-    {
-      "identity" : "w3w-swift-components",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/what3words/w3w-swift-components.git",
-      "state" : {
-        "revision" : "6ed04be4011d86642d1f8b9bbab8ac118bedbd86",
-        "version" : "3.0.0"
-      }
-    },
     {
       "identity" : "w3w-swift-core",
       "kind" : "remoteSourceControl",
@@ -35,15 +26,6 @@
       "state" : {
         "revision" : "bd201b3c09d7d2cb7dc88423ea034de92fa3334b",
         "version" : "1.2.0"
-      }
-    },
-    {
-      "identity" : "w3w-swift-wrapper",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/what3words/w3w-swift-wrapper.git",
-      "state" : {
-        "revision" : "a83c2ba97096b083a410ce348e0f555df9687fd4",
-        "version" : "4.0.0"
       }
     }
   ],
