@@ -22,7 +22,7 @@ public class W3WMapState: W3WMapStateProtocol, W3WMapStateFunctionsProtocol, W3W
   // is this redundant? - it's needed for W3WMapStateProtocol conformity...
   public var onError: W3WErrorResponse = { _ in }
 
-  /// colour scheme for a map
+  /// colour scheme for a map - do we need this?
   public var scheme = W3WLive<W3WSwiftThemes.W3WScheme?>(.w3w)
   
   /// all the markers to show on a map
@@ -34,11 +34,31 @@ public class W3WMapState: W3WMapStateProtocol, W3WMapStateFunctionsProtocol, W3W
   /// the square to show as hovered over
   public var hovered = W3WLive<(any W3WSquare)?>(nil)
 
+  /// the position of the map in the view
   public var camera = W3WLive<W3WMapCamera?>(nil)
 
+  
+  public init(
+    error: W3WEvent<W3WError?> = W3WEvent<W3WError?>(),
+    scheme: W3WLive<W3WSwiftThemes.W3WScheme?> = W3WLive<W3WSwiftThemes.W3WScheme?>(.w3w),
+    markers: W3WLive<[String : W3WMarkerGroup]> = W3WLive<[String : W3WMarkerGroup]>([:]),
+    selected: W3WLive<(any W3WSquare)?> = W3WLive<(any W3WSquare)?>(nil),
+    hovered: W3WLive<(any W3WSquare)?> = W3WLive<(any W3WSquare)?>(nil),
+    camera: W3WLive<W3WMapCamera?> = W3WLive<W3WMapCamera?>(nil)
+  ) {
+    self.error = error
+    self.scheme = scheme
+    self.markers = markers
+    self.selected = selected
+    self.hovered = hovered
+    self.camera = camera
+    
+    configure()
+  }
+  
 
   /// all the state data needed to show a map
-  public init() {
+  public func configure() {
     // hook up the onError closure
     subscribe(to: error) { [weak self] error in
       if let e = error {

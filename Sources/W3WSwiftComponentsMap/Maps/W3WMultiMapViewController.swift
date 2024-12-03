@@ -18,16 +18,21 @@ open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProto
   
   /// the sdk
   var sdk: W3WProtocolV4
+  
+  /// keeps a reference to objects to keep them alive and release them on destruction
+  var keepAlive: [Any?]
 
-  /// the view model to any W3WMapViewProtocol conforming map view
-  var viewModel: W3WMapViewModelProtocol
-
+  /// convenience accessor for the map view
+  var mapView: W3WMapViewProtocol? {
+    return view as? W3WMapViewProtocol
+  }
+  
   
   /// Holds an interchangable map view
-  public init(view: W3WMapViewProtocol, viewModel: W3WMapViewModelProtocol, sdk: W3WProtocolV4) {
-    self.viewModel = viewModel
+  public init(view: W3WMapViewProtocol, sdk: W3WProtocolV4, keepAlive: [Any?] = []) {
     self.sdk = sdk
-
+    self.keepAlive = keepAlive
+    
     super.init()
 
     // set the initial map view
@@ -42,8 +47,14 @@ open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProto
   
   /// sets a map view for this view controller
   func set(mapView: W3WMapViewProtocol) {
+
+    // transfer the viewModel from the current view to the new one
+    if let oldVm = self.mapView?.viewModel {
+      mapView.set(viewModel: oldVm)
+    }
+    
+    // set the view to the new map view
     self.view = mapView
-    mapView.set(viewModel: viewModel)
   }
   
 }

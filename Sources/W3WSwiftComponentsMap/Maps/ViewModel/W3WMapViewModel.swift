@@ -10,8 +10,13 @@ import W3WSwiftCore
 import W3WSwiftThemes
 
 
-public class W3WMapViewModel: W3WMapViewModelProtocol, W3WMapStateFunctionsProtocol {
+public class W3WMapViewModel: W3WMapViewModelProtocol, W3WMapStateFunctionsProtocol, W3WEventSubscriberProtocol {
+  public var subscriptions = W3WEventsSubscriptions()
   
+  public var input = W3WEvent<W3WMapInputEvent>()
+
+  public var output = W3WEvent<W3WMapOutputEvent>()
+
   public var w3w: W3WProtocolV4
   
   public var mapState = W3WMapState()
@@ -22,6 +27,18 @@ public class W3WMapViewModel: W3WMapViewModelProtocol, W3WMapStateFunctionsProto
   public init(mapState: W3WMapState = W3WMapState(), w3w: W3WProtocolV4) {
     self.mapState = mapState
     self.w3w = w3w
+    
+    subscribe(to: input) { [weak self] event in
+      self?.handle(event: event)
+    }
+  }
+  
+  
+  func handle(event: W3WMapInputEvent) {
+    switch event {
+      case .selected(let square):
+        mapState.selected.send(square)
+    }
   }
   
   

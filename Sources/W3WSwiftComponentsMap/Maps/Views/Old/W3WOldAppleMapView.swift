@@ -16,7 +16,7 @@ import W3WSwiftCoreSdk
 
 // FOR ZOOM LEVEL LOOK AT https://github.com/johndpope/MKMapViewZoom
 
-public class W3WAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberProtocol, MKMapViewDelegate {
+public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberProtocol, MKMapViewDelegate {
     
   public var subscriptions = W3WEventsSubscriptions()
   
@@ -39,30 +39,42 @@ public class W3WAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
   
   
   func configure() {
+    set(viewModel: viewModel)
     mapView.delegate = self
     addSubview(mapView)
     mapView.cameraZoomRange = MKMapView.CameraZoomRange(minCenterCoordinateDistance: 0.00001, maxCenterCoordinateDistance: 10000.0)
-    mapView.mapType = .mutedStandard
+    set(type: .hybrid)
+  }
+  
+  
+//  public func set(type: W3WMapType) {
+//    set(type: type.value)
+//  }
+  
+  
+  public func set(type: String) {
+    switch type {
+      case "standard":      mapView.mapType = .standard
+      case "satellite":      mapView.mapType = .satellite
+      case "hybrid":          mapView.mapType = .hybrid
+      case "satelliteFlyover": mapView.mapType = .satelliteFlyover
+      case "hybridFlyover":   mapView.mapType = .hybridFlyover
+      case "mutedStandard":  mapView.mapType = .mutedStandard
+      default:              mapView.mapType = .standard
+    }
   }
 
   
   public func set(viewModel: W3WMapViewModelProtocol) {
     self.viewModel = viewModel
     
-    subscribe(to: viewModel.mapState.camera) { [weak self] camera in self?.handle(mapCamera: camera) }
+    subscribe(to: viewModel.mapState.camera)   { [weak self] camera in self?.handle(mapCamera: camera) }
+    subscribe(to: viewModel.mapState.selected) { [weak self] square in self?.handle(selected: square) }
   }
   
   
-  public func set(type: String) {
-    switch type {
-      case "standard": mapView.mapType = .standard
-      case "satellite": mapView.mapType = .satellite
-      case "hybrid": mapView.mapType = .hybrid
-      case "satelliteFlyover": mapView.mapType = .satelliteFlyover
-      case "hybridFlyover": mapView.mapType = .hybridFlyover
-      case "mutedStandard": mapView.mapType = .mutedStandard
-      default: mapView.mapType = .standard
-    }
+  func handle(selected: W3WSquare?) {
+    mapView.addMarker(at: selected)
   }
   
   
