@@ -25,92 +25,122 @@ public extension W3WMapStateFunctionsProtocol {
   
   
   func addMarker(at square: (any W3WSquare)?, camera: W3WCameraMovement, color: W3WColor?, group: String? = nil) {
-    let group = group ?? Self.defautGroupName
-    
-    if let s = square {
-      mapState.markers.value[group]?.markers.append(s)
-    }
+    mapState.markers.value
+    //let groupName = group ?? Self.defautGroupName
+    //
+    //if let s = square {
+    //  if let markerGroup = mapState.markers.value.first(where: { m in m.name == groupName }) {
+    //    markerGroup.markers.append(s)
+    //  } else {
+    //    mapState.markers.value.append(W3WMarkerGroup(name: groupName, markers: [s]))
+    //  }
+    //}
   }
+
   
   func addMarker(at suggestion: (any W3WSuggestion)?, camera: W3WCameraMovement, color: W3WColor?, group: String?) {
   }
   
+  
   func addMarker(at words: String?, camera: W3WCameraMovement, color: W3WColor?, group: String?) {
   }
+  
   
   func addMarker(at coordinates: CLLocationCoordinate2D?, camera: W3WCameraMovement, color: W3WColor?, group: String?) {
   }
   
+  
   func addMarker(at squares: [any W3WSquare]?, camera: W3WCameraMovement, color: W3WColor?, group: String?) {
   }
+  
   
   func addMarker(at suggestions: [any W3WSuggestion]?, camera: W3WCameraMovement, color: W3WColor?, group: String?) {
   }
   
+  
   func addMarker(at words: [String]?, camera: W3WCameraMovement, color: W3WColor?, group: String?) {
   }
+  
   
   func addMarker(at coordinates: [CLLocationCoordinate2D]?, camera: W3WCameraMovement, color: W3WColor?, group: String?) {
   }
   
+  
   func removeMarker(at suggestion: (any W3WSuggestion)?) {
   }
+  
   
   func removeMarker(at words: String?) {
   }
   
+  
   func removeMarker(at squares: [any W3WSquare]?) {
   }
+  
   
   func removeMarker(at suggestions: [any W3WSuggestion]?) {
   }
   
+  
   func removeMarker(at words: [String]?) {
   }
+  
   
   func removeMarker(at square: (any W3WSquare)?) {
   }
   
+  
   func removeMarker(group: String) {
-    mapState.markers.value.removeValue(forKey: group)
   }
+  
   
   func select(at: any W3WSquare) {
   }
   
+  
   func unselect() {
   }
+  
   
   func hover(at: CLLocationCoordinate2D) {
   }
   
+  
   func unhover() {
   }
+  
   
   func getAllMarkers() -> [any W3WSquare] {
     return []
   }
   
+  
   func removeAllMarkers() {
   }
+  
   
   func findMarker(by coordinates: CLLocationCoordinate2D) -> (any W3WSquare)? {
     return nil
   }
   
+  
   func set(defaultZoom: W3WPointsPerSquare) {
   }
   
+  
   func set(zoom: W3WPointsPerMeter) {
   }
+  
   
   func getZoom() -> W3WPointsPerMeter {
     return 8.0
   }
   
+  
   func getViewBoundaries() -> any W3WBox {
     return W3WBaseBox(southWest: .init(latitude: 0.0, longitude: 0.0), northEast: .init(latitude: 0.1, longitude: 0.1))
   }
+  
   
   func set(viewBoundaries: any W3WBox) {
   }

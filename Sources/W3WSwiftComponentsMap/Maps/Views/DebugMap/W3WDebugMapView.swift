@@ -20,14 +20,16 @@ public class W3WDebugMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
   
   public var viewModel: W3WMapViewModelProtocol
   
-  public var types: [W3WMapType] { get { return [.standard, .satellite, .hybrid, "silly"] } }
+  public var types: [W3WMapType] { get { return ["Muted Standard"] } }
+
+  var mapView = MKMapView(frame: .w3wWhatever)
   
   var selected  = W3WLabel(scheme: .w3w.with(border: .lightBlue, thickness: 0.5))
   var markers   = W3WLabel(scheme: .w3w.with(border: .lightBlue, thickness: 0.5))
   var hovered   = W3WLabel(scheme: .w3w.with(border: .lightBlue, thickness: 0.5))
   var mapCamera = W3WLabel(scheme: .w3w.with(border: .lightBlue, thickness: 0.5))
   var errors    = W3WLabel(scheme: .w3w.with(border: .lightBlue, thickness: 0.5))
-  var mapType   = W3WLabel(scheme: .w3w.with(border: .lightBlue, thickness: 0.5))
+  var mapKind   = W3WLabel(scheme: .w3w.with(border: .lightBlue, thickness: 0.5))
 
   
   public init(viewModel: W3WMapViewModelProtocol) {
@@ -45,6 +47,8 @@ public class W3WDebugMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
   func configure() {
     set(viewModel: viewModel)
 
+    addSubview(mapView)
+    
     selected.numberOfLines = 1
     hovered.attributedText = "Selected:".w3w.style(color: .mediumGrey).asAttributedString()
     selected.set(position: .absolute(x: 32.0, y: 192.0, width: 300.0, height: 24.0)) //.center(size: CGSize(width: 320.0, height: 32.0)))
@@ -69,10 +73,10 @@ public class W3WDebugMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
     errors.set(position: .place(below: mapCamera, height: 48.0))
     addSubview(errors)
     
-    mapType.numberOfLines = 0
-    mapType.attributedText = "Map Type:".w3w.style(color: .mediumGrey).asAttributedString()
-    mapType.set(position: .place(below: errors, height: 24.0))
-    addSubview(mapType)
+    mapKind.numberOfLines = 0
+    mapKind.attributedText = "Map Type:".w3w.style(color: .mediumGrey).asAttributedString()
+    mapKind.set(position: .place(below: errors, height: 24.0))
+    addSubview(mapKind)
   }
   
   
@@ -111,7 +115,8 @@ public class W3WDebugMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
  
   
   public func set(type: String) {
-    self.mapType.attributedText = ("Map type: ".w3w.style(color: .mediumGrey) + W3WString(type.description)).asAttributedString()
+    self.mapKind.attributedText = ("Map type: ".w3w.style(color: .mediumGrey) + W3WString(type.description)).asAttributedString()
+    mapView.mapType = .mutedStandard
   }
 
 
@@ -123,16 +128,9 @@ public class W3WDebugMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
   }
   
   
-  func handle(markers: [String : W3WMarkerGroup]) {
+  func handle(markers: W3WMarkersLists) {
     var text = "Markers: {".w3w.style(color: .mediumGrey)
-    
-    for (key, value) in markers {
-      text += W3WString(key + " " + value.name + " ")
-      for square in value.markers {
-        text += W3WString("[" + (square.words ?? "none") + "]")
-      }
-    }
-    
+    text += markers.description.w3w
     text += "}".w3w.style(color: .mediumGrey)
     
     self.markers.attributedText = text.asAttributedString()
@@ -168,6 +166,8 @@ public class W3WDebugMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
   open override func layoutSubviews() {
     super.layoutSubviews()
     updateView()
+    
+    mapView.frame = bounds
     
     // update all w3wview positions
     for subview in subviews {

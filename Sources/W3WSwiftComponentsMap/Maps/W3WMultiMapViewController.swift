@@ -23,9 +23,7 @@ open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProto
   var keepAlive: [Any?]
 
   /// convenience accessor for the map view
-  var mapView: W3WMapViewProtocol? {
-    return view as? W3WMapViewProtocol
-  }
+  var mapView: W3WMapViewProtocol?
   
   
   /// Holds an interchangable map view
@@ -46,15 +44,37 @@ open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProto
 
   
   /// sets a map view for this view controller
-  func set(mapView: W3WMapViewProtocol) {
-
+  public func set(mapView: W3WMapViewProtocol) {
     // transfer the viewModel from the current view to the new one
     if let oldVm = self.mapView?.viewModel {
       mapView.set(viewModel: oldVm)
     }
-    
-    // set the view to the new map view
-    self.view = mapView
+
+    // if there is already a map there, then fade the new one in
+    if let currentMap = self.mapView {
+      self.mapView = mapView
+      mapView.alpha = 0.0
+      self.view.insertSubview(mapView, aboveSubview: currentMap)
+      UIView.animate(withDuration: W3WDuration.defaultAnimationSpeed.seconds, animations: {
+        mapView.alpha = 1.0
+      }, completion: { success in
+        currentMap.removeFromSuperview()
+      })
+      
+    // if this is the first map then just plop it into place
+    } else {
+      self.mapView = mapView
+      
+      // set the view to the new map view
+      self.view.addSubview(mapView)
+      view.sendSubviewToBack(mapView)
+    }
+  }
+  
+  
+  override open func viewWillLayoutSubviews() {
+    super.viewWillLayoutSubviews()
+    mapView?.frame = view.bounds
   }
   
 }

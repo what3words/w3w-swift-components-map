@@ -13,7 +13,7 @@ public protocol W3WMapStateProtocol {
 
   var scheme: W3WLive<W3WScheme?> { get set }
   
-  var markers: W3WLive<[String : W3WMarkerGroup]> { get set }
+  var markers: W3WLive<W3WMarkersLists> { get set }
   
   var selected: W3WLive<W3WSquare?> { get set }
   

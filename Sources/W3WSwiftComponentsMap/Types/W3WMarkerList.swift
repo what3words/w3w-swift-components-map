@@ -7,12 +7,10 @@
 
 import W3WSwiftCore
 import W3WSwiftThemes
+import Foundation
 
 
-public class W3WMarkerGroup {
-  
-  /// name of the group
-  var name: String
+public class W3WMarkerList: CustomStringConvertible {
   
   /// the colour of the markers in theis group
   var color: W3WColor?
@@ -22,10 +20,26 @@ public class W3WMarkerGroup {
   
   
   /// a named, coloured, group of markers
-  init(name: String, color: W3WColor? = nil, markers: [W3WSquare]) {
-    self.name = name
+  init(color: W3WColor? = nil, markers: [W3WSquare] = []) {
     self.color = color
     self.markers = markers
   }
+  
+  
+  /// as a string
+  public var description: String {
+    var retval = ""
+    
+    if let c = color {
+      retval += "(\(c.description)) "
+    }
+    
+    for marker in markers {
+      retval += "\(marker.description), "
+    }
+    
+    return retval.trimmingCharacters(in: .whitespaces).trimmingCharacters(in: CharacterSet(charactersIn: ","))
+  }
+
   
 }

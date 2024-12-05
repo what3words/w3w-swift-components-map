@@ -26,7 +26,7 @@ public class W3WMapState: W3WMapStateProtocol, W3WMapStateFunctionsProtocol, W3W
   public var scheme = W3WLive<W3WSwiftThemes.W3WScheme?>(.w3w)
   
   /// all the markers to show on a map
-  public var markers = W3WLive<[String : W3WMarkerGroup]>([:])
+  public var markers = W3WLive<W3WMarkersLists>(W3WMarkersLists())
   
   /// the selected square on a map
   public var selected = W3WLive<(any W3WSquare)?>(nil)
@@ -41,7 +41,7 @@ public class W3WMapState: W3WMapStateProtocol, W3WMapStateFunctionsProtocol, W3W
   public init(
     error: W3WEvent<W3WError?> = W3WEvent<W3WError?>(),
     scheme: W3WLive<W3WSwiftThemes.W3WScheme?> = W3WLive<W3WSwiftThemes.W3WScheme?>(.w3w),
-    markers: W3WLive<[String : W3WMarkerGroup]> = W3WLive<[String : W3WMarkerGroup]>([:]),
+    markers: W3WLive<W3WMarkersLists> = W3WLive<W3WMarkersLists>(W3WMarkersLists()),
     selected: W3WLive<(any W3WSquare)?> = W3WLive<(any W3WSquare)?>(nil),
     hovered: W3WLive<(any W3WSquare)?> = W3WLive<(any W3WSquare)?>(nil),
     camera: W3WLive<W3WMapCamera?> = W3WLive<W3WMapCamera?>(nil)
