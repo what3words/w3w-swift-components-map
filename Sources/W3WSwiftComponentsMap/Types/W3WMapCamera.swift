@@ -14,12 +14,20 @@ public struct W3WMapCamera: Equatable, CustomStringConvertible {
   
   public var center: CLLocationCoordinate2D?
   
-  public var scale: W3WPointsPerMeter? = 0.1
+  public var scale: W3WMapScale? = 0.1
 
   public var angle: W3WAngle?
   
   public var pitch: W3WAngle?
 
+  
+  public init(center: CLLocationCoordinate2D? = nil, scale: W3WMapScale? = nil, angle: W3WAngle? = nil, pitch: W3WAngle? = nil) {
+    self.center = center
+    self.scale = scale
+    self.angle = angle
+    self.pitch = pitch
+  }
+  
   
   // MARK: Protocol Conformance
   

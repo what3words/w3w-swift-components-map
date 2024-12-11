@@ -45,7 +45,7 @@ public class W3WMarkersLists: CustomStringConvertible {
   ///   - group: the name of the group to add
   /// - Returns: true if removed successfully, false if there is no group named that
   public func remove(listName: String) -> Bool {
-    guard let list = lists[listName] else { return false }
+    guard let _ = lists[listName] else { return false }
     lists[listName] = nil
     return true
   }

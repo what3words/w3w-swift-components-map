@@ -152,7 +152,7 @@ public class W3WDebugMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
   func handle(mapCamera: W3WMapCamera?) {
     var text = "Camera: {\n".w3w.style(color: .mediumGrey)
 
-    text += "\(mapCamera?.description)".w3w
+    text += "\(mapCamera?.description ?? "")".w3w
     
     text += "\n}".w3w.style(color: .mediumGrey)
 

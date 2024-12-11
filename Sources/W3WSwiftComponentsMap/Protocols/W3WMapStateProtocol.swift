@@ -21,6 +21,8 @@ public protocol W3WMapStateProtocol {
 
   var camera: W3WLive<W3WMapCamera?> { get set }
   
+  var error: W3WEvent<W3WError?> { get set }
+
 }
 
 

@@ -16,7 +16,7 @@ import W3WSwiftCoreSdk
 
 // FOR ZOOM LEVEL LOOK AT https://github.com/johndpope/MKMapViewZoom
 
-public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberProtocol, MKMapViewDelegate {
+public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberProtocol, MKMapViewDelegate, UIGestureRecognizerDelegate {
     
   public var subscriptions = W3WEventsSubscriptions()
   
@@ -42,8 +42,11 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
     set(viewModel: viewModel)
     mapView.delegate = self
     addSubview(mapView)
-    mapView.cameraZoomRange = MKMapView.CameraZoomRange(minCenterCoordinateDistance: 0.00001, maxCenterCoordinateDistance: 10000.0)
+    //mapView.cameraZoomRange = MKMapView.CameraZoomRange(minCenterCoordinateDistance: 0.00001, maxCenterCoordinateDistance: 10000.0)
     set(type: .hybrid)
+
+    bind()
+    attachTapRecognizer()
   }
   
   
@@ -51,6 +54,54 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
 //    set(type: type.value)
 //  }
   
+  
+  func bind() {
+    subscribe(to: viewModel.mapState.camera) { [weak self] camera in
+      self?.handle(mapCamera: camera)
+    }
+  }
+  
+  
+  /// add the gesture recognizer for tap
+  func attachTapRecognizer() {
+    /// detect user taps
+    let tap = UITapGestureRecognizer(target: self, action: #selector(tapped))
+    tap.numberOfTapsRequired = 1
+    tap.numberOfTouchesRequired = 1
+
+    // A kind of tricky thing to make sure double tap doesn't trigger single tap
+    let doubleTap = UITapGestureRecognizer(target: self, action:nil)
+    doubleTap.numberOfTapsRequired = 2
+    mapView.addGestureRecognizer(doubleTap)
+    tap.require(toFail: doubleTap)
+
+    // don't let the tap trickle through to the parent view
+    //tap.cancelsTouchesInView = true
+    
+    tap.delegate = self
+
+    mapView.addGestureRecognizer(tap)
+  }
+
+  
+  /// when the user taps the map this is called and it gets the square info and sends it using the closure
+  @objc func tapped(_ gestureRecognizer : UITapGestureRecognizer) {
+    let location = gestureRecognizer.location(in: mapView)
+    let coordinates = mapView.convert(location, toCoordinateFrom: mapView)
+    viewModel.w3w.convertTo3wa(coordinates: coordinates, language: W3WBaseLanguage(code: "en")) { square, error in
+      if let e = error {
+        W3WThread.runOnMain {
+          print(e)
+        }
+      }
+      if let s = square {
+        W3WThread.runOnMain {
+          self.viewModel.output.send(.selected(s))
+        }
+      }
+    }
+  }
+
   
   public func set(type: String) {
     switch type {
@@ -80,14 +131,14 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   
   func handle(mapCamera: W3WMapCamera?) {
     if let center = mapCamera?.center, let scale = mapCamera?.scale {
-      let region = MKCoordinateRegion(center: center, span: scaleToSpan(scale: scale))
+      let region = MKCoordinateRegion(center: center, span: W3WMapScale.scaleToSpan(scale: scale, mapView: mapView))
       mapView.setRegion(region, animated: true)
       
     } else if let center = mapCamera?.center {
       mapView.setCenter(center, animated: true)
       
     } else if let scale = mapCamera?.scale {
-      let region = MKCoordinateRegion(center: mapView.centerCoordinate, span: scaleToSpan(scale: scale))
+      let region = MKCoordinateRegion(center: mapView.centerCoordinate, span: W3WMapScale.scaleToSpan(scale: scale, mapView: mapView))
       mapView.setRegion(region, animated: true)
     }
   }
@@ -109,7 +160,7 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   func mkMapCameraFromW3WCamera(camera: W3WMapCamera?) -> MKMapCamera {
     return MKMapCamera(
       lookingAtCenter: camera?.center ?? mapView.centerCoordinate,
-      fromDistance: camera?.scale ?? 1.0,
+      fromDistance: Double(camera?.scale?.pointsPerMeter ?? 1.0),
       pitch: camera?.pitch?.degrees ?? 0.0,
       heading: camera?.angle?.degrees ?? 0.0
     )
@@ -123,52 +174,6 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
       angle: W3WAngle(degrees: mapView.camera.heading),
       pitch: W3WAngle(degrees: mapView.camera.pitch)
     )
-  }
-  
-  
-  func scaleToSpan(scale: W3WPointsPerMeter) -> MKCoordinateSpan {
-    let span = mapView.region.span
-    let center = mapView.region.center
-     
-    let loc1 = CLLocation(latitude: center.latitude - span.latitudeDelta * 0.5, longitude: center.longitude)
-    let loc2 = CLLocation(latitude: center.latitude + span.latitudeDelta * 0.5, longitude: center.longitude)
-    let loc3 = CLLocation(latitude: center.latitude, longitude: center.longitude - span.longitudeDelta * 0.5)
-    let loc4 = CLLocation(latitude: center.latitude, longitude: center.longitude + span.longitudeDelta * 0.5)
-     
-    let metersInLatitude = loc1.distance(from: loc2)
-    let metersInLongitude = loc3.distance(from: loc4)
-    
-    let px1 = mapView.convert(loc1.coordinate, toPointTo: mapView)
-    let px2 = mapView.convert(loc2.coordinate, toPointTo: mapView)
-    let px3 = mapView.convert(loc3.coordinate, toPointTo: mapView)
-    let px4 = mapView.convert(loc4.coordinate, toPointTo: mapView)
-    
-    let pixelsInLatitude  = abs(px1.y - px2.y)
-    let pixelsInLongitude = abs(px3.x - px4.x)
-    
-    let pixels = min(pixelsInLatitude, pixelsInLongitude)
-    var meters = min(metersInLatitude, metersInLongitude)
-    
-    if meters == 0 {
-      meters = 1.0
-    }
-    
-    let pixelsPerMeter = pixels / meters
-    
-    let factor = pixelsPerMeter / scale
-    
-    var latDelta = span.latitudeDelta * factor
-    var lngDelta = span.longitudeDelta * factor
-    
-    // sanity check
-    if latDelta.isNaN || lngDelta.isNaN {
-      latDelta = span.latitudeDelta
-      lngDelta = span.longitudeDelta
-    }
-
-    print("latitudeDelta", latDelta, "longitudeDelta", lngDelta)
-    
-    return MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lngDelta)
   }
   
   
@@ -256,3 +261,48 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
 //  }
 
 
+//  func scaleToSpan(scale: W3WMapScale) -> MKCoordinateSpan {
+//    let span = mapView.region.span
+//    let center = mapView.region.center
+//
+//    let loc1 = CLLocation(latitude: center.latitude - span.latitudeDelta * 0.5, longitude: center.longitude)
+//    let loc2 = CLLocation(latitude: center.latitude + span.latitudeDelta * 0.5, longitude: center.longitude)
+//    let loc3 = CLLocation(latitude: center.latitude, longitude: center.longitude - span.longitudeDelta * 0.5)
+//    let loc4 = CLLocation(latitude: center.latitude, longitude: center.longitude + span.longitudeDelta * 0.5)
+//
+//    let metersInLatitude = loc1.distance(from: loc2)
+//    let metersInLongitude = loc3.distance(from: loc4)
+//
+//    let px1 = mapView.convert(loc1.coordinate, toPointTo: mapView)
+//    let px2 = mapView.convert(loc2.coordinate, toPointTo: mapView)
+//    let px3 = mapView.convert(loc3.coordinate, toPointTo: mapView)
+//    let px4 = mapView.convert(loc4.coordinate, toPointTo: mapView)
+//
+//    let pixelsInLatitude  = abs(px1.y - px2.y)
+//    let pixelsInLongitude = abs(px3.x - px4.x)
+//
+//    let pixels = min(pixelsInLatitude, pixelsInLongitude)
+//    var meters = min(metersInLatitude, metersInLongitude)
+//
+//    if meters == 0 {
+//      meters = 1.0
+//    }
+//
+//    let pixelsPerMeter = pixels / meters
+//
+//    let factor = pixelsPerMeter / scale.pointsPerMeter
+//
+//    var latDelta = span.latitudeDelta * factor
+//    var lngDelta = span.longitudeDelta * factor
+//
+//    // sanity check
+//    if latDelta.isNaN || lngDelta.isNaN {
+//      latDelta = span.latitudeDelta
+//      lngDelta = span.longitudeDelta
+//    }
+//
+//    print("latitudeDelta", latDelta, "longitudeDelta", lngDelta)
+//
+//    return MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lngDelta)
+//  }
+ 

@@ -16,9 +16,6 @@ import W3WSwiftDesign
 open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProtocol {
   public var subscriptions = W3WEventsSubscriptions()
   
-  /// the sdk
-  var sdk: W3WProtocolV4
-  
   /// keeps a reference to objects to keep them alive and release them on destruction
   var keepAlive: [Any?]
 
@@ -27,8 +24,7 @@ open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProto
   
   
   /// Holds an interchangable map view
-  public init(view: W3WMapViewProtocol, sdk: W3WProtocolV4, keepAlive: [Any?] = []) {
-    self.sdk = sdk
+  public init(view: W3WMapViewProtocol, keepAlive: [Any?] = []) {
     self.keepAlive = keepAlive
     
     super.init()

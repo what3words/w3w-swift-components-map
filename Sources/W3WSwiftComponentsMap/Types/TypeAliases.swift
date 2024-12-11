@@ -12,7 +12,7 @@ import W3WSwiftCore
 public typealias W3WPointsPerSquare = CGFloat
 
 /// number of screen points that represent one meter in a map view
-public typealias W3WPointsPerMeter = CGFloat
+//public typealias W3WPointsPerMeter = CGFloat
 
 /// number of points in a centimeter of the device's screen
 public typealias W3WPointsPerDisplayCentimeter = CGFloat

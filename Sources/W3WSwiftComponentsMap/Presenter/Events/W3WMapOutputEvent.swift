@@ -5,11 +5,12 @@
 //  Created by Dave Duprey on 01/11/2024.
 //
 
-import Foundation
+import W3WSwiftCore
 
 
 public enum W3WMapOutputEvent {
   
-  case dismiss
+  case selected(W3WSquare)
+  case marker(W3WSquare)
   
 }

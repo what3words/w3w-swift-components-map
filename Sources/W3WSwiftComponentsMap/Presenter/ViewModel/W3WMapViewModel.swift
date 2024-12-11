@@ -10,7 +10,8 @@ import W3WSwiftCore
 import W3WSwiftThemes
 
 
-public class W3WMapViewModel: W3WMapViewModelProtocol, W3WMapStateFunctionsProtocol, W3WEventSubscriberProtocol {
+
+public class W3WMapViewModel: W3WMapViewModelProtocol, W3WEventSubscriberProtocol {
   public var subscriptions = W3WEventsSubscriptions()
   
   public var input = W3WEvent<W3WMapInputEvent>()
@@ -19,7 +20,7 @@ public class W3WMapViewModel: W3WMapViewModelProtocol, W3WMapStateFunctionsProto
 
   public var w3w: W3WProtocolV4
   
-  public var mapState = W3WMapState()
+  public var mapState: W3WMapStateProtocol = W3WMapState()
 
   public var onError: W3WErrorResponse = { _ in }
 
@@ -37,7 +38,7 @@ public class W3WMapViewModel: W3WMapViewModelProtocol, W3WMapStateFunctionsProto
   func handle(event: W3WMapInputEvent) {
     switch event {
       case .selected(let square):
-        mapState.selected.send(square)
+        mapState.camera.value?.center = square?.coordinates
     }
   }
   
