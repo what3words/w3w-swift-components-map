@@ -8,6 +8,7 @@
 import MapKit
 import W3WSwiftCore
 import W3WSwiftDesign
+import W3WSwiftComponents
 
 
 #if canImport(W3WSwiftCoreSdk)
@@ -22,7 +23,7 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   
   public var viewModel: W3WMapViewModelProtocol
   
-  public lazy var mapView = MKMapView() // W3WMapView(frame: .w3wWhatever, w3w: viewModel.w3w)
+  public lazy var mapView = W3WMapView(frame: .w3wWhatever, w3w: viewModel.w3w)
 
   public var types: [W3WMapType] { get { return [.standard, .satellite, .hybrid, "satelliteFlyover", "hybridFlyover", "mutedStandard"] } }
 
@@ -43,7 +44,7 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
     mapView.delegate = self
     addSubview(mapView)
     //mapView.cameraZoomRange = MKMapView.CameraZoomRange(minCenterCoordinateDistance: 0.00001, maxCenterCoordinateDistance: 10000.0)
-    set(type: .hybrid)
+    set(type: .standard)
 
     bind()
     attachTapRecognizer()
@@ -56,9 +57,8 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   
   
   func bind() {
-    subscribe(to: viewModel.mapState.camera) { [weak self] camera in
-      self?.handle(mapCamera: camera)
-    }
+    subscribe(to: viewModel.mapState.camera) { [weak self] camera in self?.handle(mapCamera: camera) }
+    subscribe(to: viewModel.mapState.markers) { [weak self] markers in self?.handle(markers: markers) }
   }
   
   
@@ -126,6 +126,16 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   
   func handle(selected: W3WSquare?) {
     //mapView.addMarker(at: selected)
+  }
+  
+  
+  func handle(markers: W3WMarkersLists) {
+    mapView.removeAllMarkers()
+    for (name, list) in markers.lists {
+      for marks in list.markers {
+        mapView.addMarker(at: marks, camera: .none, color: list.color?.current.uiColor)
+      }
+    }
   }
   
   

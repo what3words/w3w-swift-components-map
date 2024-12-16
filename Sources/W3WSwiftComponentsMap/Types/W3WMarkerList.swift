@@ -20,7 +20,7 @@ public class W3WMarkerList: CustomStringConvertible {
   
   
   /// a named, coloured, group of markers
-  init(color: W3WColor? = nil, markers: [W3WSquare] = []) {
+  public init(color: W3WColor? = nil, markers: [W3WSquare] = []) {
     self.color = color
     self.markers = markers
   }

@@ -12,7 +12,11 @@ import W3WSwiftThemes
 /// Interface for map functions
 public protocol W3WMapProtocol {
   
+  /// the map state to act upon
   var state: W3WMapStateProtocol { get set }
+  
+  /// to resolve words into coords and vice versa
+  var w3w: W3WProtocolV4 { get set }
   
   // returns the error enum for any error that occurs
   var onError: W3WErrorResponse { get set }
@@ -65,10 +69,10 @@ public protocol W3WMapProtocol {
   // find a marker by it's coordinates and return it if it exists in the map
   func findMarker(by coordinates: CLLocationCoordinate2D) -> W3WSquare?
   
-  func set(center: W3WSquare)
-  func set(center: W3WSuggestion)
-  func set(center: String)
-  func set(center: CLLocationCoordinate2D)
+  func set(center: W3WSquare?)
+  func set(center: W3WSuggestion?)
+  func set(center: String?)
+  func set(center: CLLocationCoordinate2D?, language: W3WLanguage)
   
   // zoom related setter functions
   func set(defaultZoom: W3WPointsPerSquare) // sets the size of a square after .zoom is used in a show() call
@@ -85,10 +89,7 @@ public extension W3WMapProtocol {
   
   static var defautGroupName: String { get { return "default" } }
   
-  
-  func set(state: any W3WMapStateProtocol) {
-  }
-  
+    
   func addMarker(at square: W3WSquare?, camera: W3WCameraMovement, color: W3WColor?, group: String?) {
   }
   
@@ -157,26 +158,38 @@ public extension W3WMapProtocol {
     return nil
   }
   
-  func set(center: W3WSquare) {
-    if state.camera.value == nil {
-      state.camera.value = W3WMapCamera()
+  func set(center: W3WSquare?) {
+    state.send(center: center?.coordinates)
+  }
+ 
+  func set(center: W3WSuggestion?) {
+    if let words = center?.words {
+      w3w.convertToCoordinates(words: words) { square, error in
+        self.state.send(center: square?.coordinates)
+      }
+    } else {
+      self.state.send(center: nil)
     }
-    
-    if state.camera.value?.center == nil {
-      state.camera.value?.center = center.coordinates
+  }
+ 
+  func set(center: String?) {
+    if let words = center {
+      w3w.convertToCoordinates(words: words) { square, error in
+        self.state.send(center: square?.coordinates)
+      }
+    } else {
+      self.state.send(center: nil)
     }
-    
-    state.camera.value?.center = center.coordinates
-    state.camera.send(state.camera.value)
   }
  
-  func set(center: W3WSuggestion) {
-  }
- 
-  func set(center: String) {
-  }
- 
-  func set(center: CLLocationCoordinate2D) {
+  func set(center: CLLocationCoordinate2D?, language: W3WLanguage) {
+    if let coordinates = center {
+      w3w.convertTo3wa(coordinates: coordinates, language: language) { square, error in
+        self.state.send(center: square?.coordinates)
+      }
+    } else {
+      self.state.send(center: nil)
+    }
   }
  
 

@@ -67,6 +67,16 @@ public class W3WMarkersLists: CustomStringConvertible {
   }
   
   
+  /// add a list
+  /// - Parameters:
+  ///   - listName: the name of the group to add to
+  ///   - list: the list to add
+  /// - Returns: true if added successfully, false if no such group exists
+  public func add(listName: String, list: W3WMarkerList) {
+    lists[listName] = list
+  }
+
+  
   /// remove a square from a group
   /// - Parameters:
   ///   - group: the name of the group to add to

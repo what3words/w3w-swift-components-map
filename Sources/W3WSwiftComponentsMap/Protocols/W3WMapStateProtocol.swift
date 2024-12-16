@@ -23,6 +23,12 @@ public protocol W3WMapStateProtocol {
   
   var error: W3WEvent<W3WError?> { get set }
 
+  
+  func send(scale: Double?)
+  func send(scale: W3WMapScale?)
+  func send(center: CLLocationCoordinate2D?)
+  func send(pitch: W3WAngle?)
+
 }
 
 

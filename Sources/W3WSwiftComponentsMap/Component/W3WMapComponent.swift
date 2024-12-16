@@ -15,6 +15,12 @@ open class W3WMapComponent: W3WMultiMapViewController, W3WMapProtocol {
 
   var viewModel: W3WMapViewModelProtocol!
   
+  // for W3WMapProtocol compliance
+  public var w3w: W3WProtocolV4 {
+    get { return viewModel.w3w }
+    set { viewModel.w3w = newValue }
+  }
+  
   /// called when the user taps a square in the map
   public var onSquareSelected: (W3WSquare) -> () = { _ in }
   
@@ -66,6 +72,11 @@ open class W3WMapComponent: W3WMultiMapViewController, W3WMapProtocol {
     }
   }
   
+  
+  public func set(state: any W3WMapStateProtocol) {
+    self.state = state
+  }
+
   
   public func set(w3w: W3WProtocolV4) {
     viewModel.w3w = w3w

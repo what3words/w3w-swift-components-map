@@ -39,6 +39,12 @@ public class W3WMapViewModel: W3WMapViewModelProtocol, W3WEventSubscriberProtoco
     switch event {
       case .selected(let square):
         mapState.camera.value?.center = square?.coordinates
+      case .markers(let markers):
+        mapState.markers.send(markers)
+      case .center(let square):
+        mapState.camera.value?.center = square.coordinates
+        mapState.camera.value?.scale = W3WMapScale(pointsPerMeter: 0.02)
+        mapState.camera.send(mapState.camera.value)
     }
   }
   

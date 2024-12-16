@@ -24,16 +24,16 @@ public class W3WMapState: W3WMapStateProtocol, W3WEventSubscriberProtocol {
   public var onError: W3WErrorResponse = { _ in }
 
   /// colour scheme for a map - do we need this?
-  public var scheme = W3WLive<W3WSwiftThemes.W3WScheme?>(.w3w)
+  public var scheme = W3WLive<W3WScheme?>(.w3w)
   
   /// all the markers to show on a map
   public var markers = W3WLive<W3WMarkersLists>(W3WMarkersLists())
   
   /// the selected square on a map
-  public var selected = W3WLive<(any W3WSquare)?>(nil)
+  public var selected = W3WLive<W3WSquare?>(nil)
   
   /// the square to show as hovered over
-  public var hovered = W3WLive<(any W3WSquare)?>(nil)
+  public var hovered = W3WLive<W3WSquare?>(nil)
 
   /// the position of the map in the view
   public var camera = W3WLive<W3WMapCamera?>(nil)
@@ -87,28 +87,32 @@ public class W3WMapState: W3WMapStateProtocol, W3WEventSubscriberProtocol {
   }
   
   
-  public func send(scale: Double) {
+  public func send(scale: Double?) {
     var newValue = getOrMakeCamera()
-    newValue?.scale = W3WMapScale(pointsPerMeter: scale)
+    if let s = scale {
+      newValue?.scale = W3WMapScale(pointsPerMeter: s)
+    } else {
+      newValue?.scale = nil
+    }
     camera.send(newValue)
   }
   
   
-  public func send(scale: W3WMapScale) {
+  public func send(scale: W3WMapScale?) {
     var newValue = getOrMakeCamera()
     newValue?.scale = scale
     camera.send(newValue)
   }
 
   
-  public func send(center: CLLocationCoordinate2D) {
+  public func send(center: CLLocationCoordinate2D?) {
     var newValue = getOrMakeCamera()
     newValue?.center = center
     camera.send(newValue)
   }
   
   
-  public func send(pitch: W3WAngle) {
+  public func send(pitch: W3WAngle?) {
     var newValue = getOrMakeCamera()
     newValue?.pitch = pitch
     camera.send(newValue)
