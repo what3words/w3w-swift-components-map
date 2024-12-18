@@ -40,6 +40,29 @@ public class W3WMarkerList: CustomStringConvertible {
     
     return retval.trimmingCharacters(in: .whitespaces).trimmingCharacters(in: CharacterSet(charactersIn: ","))
   }
+  
+  /// Returns an array of all W3WSquare markers in the marker list.
+  ///
+  /// Since the markers property is internal to the W3WMarkerList class package,
+  /// this method provides public access to the markers collection.
+  ///
+  /// - Returns: An array of W3WSquare objects representing all markers in the list.
+  ///           Returns an empty array if no markers are present.
+  ///
+  /// - Example:
+  ///   ```swift
+  ///   let markerList = W3WMarkerList()
+  ///   let squares = markerList.getMarkers()
+  ///
+  ///   for square in squares {
+  ///       // Work with each W3WSquare marker
+  ///       mapHelper.addMarker(at: square)
+  ///   }
+  ///   ```
+  
+  public func getmarkers() -> [W3WSquare] {
+    return markers
+  }
 
   
 }
