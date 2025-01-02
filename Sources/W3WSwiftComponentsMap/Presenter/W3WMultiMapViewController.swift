@@ -20,7 +20,7 @@ open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProto
   var keepAlive: [Any?]
 
   /// convenience accessor for the map view
-  var mapView: W3WMapViewProtocol?
+  public var mapView: W3WMapViewProtocol?
   
   
   /// Holds an interchangable map view
@@ -39,8 +39,20 @@ open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProto
   }
 
   
+  /// sets a map type for this view controller
+  public func set(mapType: W3WMapType) {
+    mapView?.set(type: mapType)
+  }
+
+  
+  /// gets the map type for this view controller
+  public func getMapType() -> W3WMapType {
+    return mapView?.getType() ?? "Unknown"
+  }
+
+
   /// sets a map view for this view controller
-  public func set(mapView: W3WMapViewProtocol) {
+  open func set(mapView: W3WMapViewProtocol) {
     // transfer the viewModel from the current view to the new one
     if let oldVm = self.mapView?.viewModel {
       mapView.set(viewModel: oldVm)

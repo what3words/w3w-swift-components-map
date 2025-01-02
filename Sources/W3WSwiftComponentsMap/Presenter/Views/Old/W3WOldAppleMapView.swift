@@ -88,7 +88,8 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   @objc func tapped(_ gestureRecognizer : UITapGestureRecognizer) {
     let location = gestureRecognizer.location(in: mapView)
     let coordinates = mapView.convert(location, toCoordinateFrom: mapView)
-    viewModel.w3w.convertTo3wa(coordinates: coordinates, language: W3WBaseLanguage(code: "en")) { square, error in
+
+    viewModel.w3w.convertTo3wa(coordinates: coordinates, language: viewModel.mapState.language.value ?? W3WBaseLanguage.english) { square, error in
       if let e = error {
         W3WThread.runOnMain {
           print(e)
@@ -115,6 +116,19 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
     }
   }
 
+  
+  public func getType() -> W3WMapType {
+    switch mapView.mapType {
+      case .standard: return "standard"
+      case .satellite: return "satellite"
+      case .hybrid: return "hybrid"
+      case .satelliteFlyover: return "satelliteFlyover"
+      case .hybridFlyover: return "hybridFlyover"
+      case .mutedStandard: return "mutedStandard"
+      default: return "unknown"
+    }
+  }
+  
   
   public func set(viewModel: W3WMapViewModelProtocol) {
     self.viewModel = viewModel
@@ -160,11 +174,21 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   // Tells the delegate when the map view’s visible region changes.
   public func mapViewDidChangeVisibleRegion(_: MKMapView) {
     //viewModel.mapState.camera.send(makeW3WMapCameraFromMapView())
+    viewModel.output.send(.mapMove)
   }
 
 
   // MARK: Util
   
+  
+  public func pointFor(coordinate: CLLocationCoordinate2D) -> CGPoint {
+    return mapView.convert(coordinate, toPointTo: nil)
+  }
+  
+  public func coordinateFor(point: CGPoint) -> CLLocationCoordinate2D {
+    return mapView.convert(point, toCoordinateFrom: nil)
+  }
+
   
   // given a W3WMapCamera, make a MKMapCamera
   func mkMapCameraFromW3WCamera(camera: W3WMapCamera?) -> MKMapCamera {

@@ -119,6 +119,11 @@ public class W3WDebugMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
     mapView.mapType = .mutedStandard
   }
 
+  
+  public func getType() -> W3WMapType {
+    return types.first ?? "Unknown"
+  }
+  
 
   // MARK: Event Handlers
   
@@ -157,6 +162,18 @@ public class W3WDebugMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
     text += "\n}".w3w.style(color: .mediumGrey)
 
     self.mapCamera.attributedText = text.asAttributedString()
+  }
+  
+  
+  // MARK: Untilities
+  
+  
+  public func pointFor(coordinate: CLLocationCoordinate2D) -> CGPoint {
+    return mapView.convert(coordinate, toPointTo: nil)
+  }
+  
+  public func coordinateFor(point: CGPoint) -> CLLocationCoordinate2D {
+    return mapView.convert(point, toCoordinateFrom: nil)
   }
   
   
