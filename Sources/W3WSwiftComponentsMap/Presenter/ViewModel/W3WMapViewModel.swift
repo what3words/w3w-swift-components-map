@@ -10,7 +10,6 @@ import W3WSwiftCore
 import W3WSwiftThemes
 
 
-
 public class W3WMapViewModel: W3WMapViewModelProtocol, W3WEventSubscriberProtocol {
   public var subscriptions = W3WEventsSubscriptions()
   
@@ -20,14 +19,17 @@ public class W3WMapViewModel: W3WMapViewModelProtocol, W3WEventSubscriberProtoco
 
   public var w3w: W3WProtocolV4
   
-  public var mapState: W3WMapStateProtocol = W3WMapState()
+  public var gps: W3WLive<W3WSquare?>
+  
+  public var mapState: W3WMapStateProtocol
 
   public var onError: W3WErrorResponse = { _ in }
 
   
-  public init(mapState: W3WMapState = W3WMapState(), w3w: W3WProtocolV4) {
-    self.mapState = mapState
+  public init(language: W3WLive<W3WLanguage?> = W3WLive<W3WLanguage?>(W3WBaseLanguage.english), w3w: W3WProtocolV4, gps: W3WLive<W3WSquare?> = W3WLive<W3WSquare?>(nil)) {
+    self.mapState = W3WMapState(language: language)
     self.w3w = w3w
+    self.gps = gps
     
     subscribe(to: input) { [weak self] event in
       self?.handle(event: event)
@@ -38,13 +40,14 @@ public class W3WMapViewModel: W3WMapViewModelProtocol, W3WEventSubscriberProtoco
   func handle(event: W3WMapInputEvent) {
     switch event {
       case .selected(let square):
-        mapState.camera.value?.center = square?.coordinates
+        mapState.camera.send(W3WMapCamera(center: square?.coordinates))
+        mapState.selected.send(square)
       case .markers(let markers):
         mapState.markers.send(markers)
-      case .center(let square):
-        mapState.camera.value?.center = square.coordinates
-        mapState.camera.value?.scale = W3WMapScale(pointsPerMeter: 0.02)
-        mapState.camera.send(mapState.camera.value)
+      case .center(let square, let scale):
+        if let centre = square.coordinates {
+          mapState.camera.send(W3WMapCamera(center: centre, scale: scale))
+        }
     }
   }
   

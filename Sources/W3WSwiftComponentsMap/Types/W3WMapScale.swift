@@ -68,48 +68,58 @@ public struct W3WMapScale: Equatable, ExpressibleByFloatLiteral, CustomStringCon
   /// it needs to be rewritten carefully
   @available(*, deprecated, message: "this HAS NOT been tested, it is here as a temporary example")
   public static func scaleToSpan(scale: W3WMapScale, mapView: MKMapView) -> MKCoordinateSpan {
+        
     let span = mapView.region.span
     let center = mapView.region.center
-     
-    let loc1 = CLLocation(latitude: center.latitude - span.latitudeDelta * 0.5, longitude: center.longitude)
-    let loc2 = CLLocation(latitude: center.latitude + span.latitudeDelta * 0.5, longitude: center.longitude)
-    let loc3 = CLLocation(latitude: center.latitude, longitude: center.longitude - span.longitudeDelta * 0.5)
-    let loc4 = CLLocation(latitude: center.latitude, longitude: center.longitude + span.longitudeDelta * 0.5)
-     
-    let metersInLatitude = loc1.distance(from: loc2)
-    let metersInLongitude = loc3.distance(from: loc4)
     
-    let px1 = mapView.convert(loc1.coordinate, toPointTo: mapView)
-    let px2 = mapView.convert(loc2.coordinate, toPointTo: mapView)
-    let px3 = mapView.convert(loc3.coordinate, toPointTo: mapView)
-    let px4 = mapView.convert(loc4.coordinate, toPointTo: mapView)
-    
-    let pixelsInLatitude  = abs(px1.y - px2.y)
-    let pixelsInLongitude = abs(px3.x - px4.x)
-    
-    let pixels = min(pixelsInLatitude, pixelsInLongitude)
-    var meters = min(metersInLatitude, metersInLongitude)
-    
-    if meters == 0 {
-      meters = 1.0
-    }
-    
-    let pixelsPerMeter = pixels / meters
-    
-    let factor = pixelsPerMeter / scale.pointsPerMeter
-    
-    var latDelta = span.latitudeDelta * factor
-    var lngDelta = span.longitudeDelta * factor
-    
-    // sanity check
-    if latDelta.isNaN || lngDelta.isNaN {
-      latDelta = span.latitudeDelta
-      lngDelta = span.longitudeDelta
-    }
+    let pxWidth  = mapView.frame.width
+    let pxHeight = mapView.frame.height
 
-    print("latitudeDelta", latDelta, "longitudeDelta", lngDelta)
-    
-    return MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lngDelta)
+    let metersX = pxWidth / scale.value
+    let metersY = pxHeight / scale.value
+
+    var newregion = mapView.region
+    return MKCoordinateRegion(center: center, latitudinalMeters: metersY, longitudinalMeters: metersX).span
+
+//    let loc1 = CLLocation(latitude: center.latitude - span.latitudeDelta * 0.5, longitude: center.longitude)
+//    let loc2 = CLLocation(latitude: center.latitude + span.latitudeDelta * 0.5, longitude: center.longitude)
+//    let loc3 = CLLocation(latitude: center.latitude, longitude: center.longitude - span.longitudeDelta * 0.5)
+//    let loc4 = CLLocation(latitude: center.latitude, longitude: center.longitude + span.longitudeDelta * 0.5)
+//     
+//    let metersInLatitude = loc1.distance(from: loc2)
+//    let metersInLongitude = loc3.distance(from: loc4)
+//    
+//    let px1 = mapView.convert(loc1.coordinate, toPointTo: mapView)
+//    let px2 = mapView.convert(loc2.coordinate, toPointTo: mapView)
+//    let px3 = mapView.convert(loc3.coordinate, toPointTo: mapView)
+//    let px4 = mapView.convert(loc4.coordinate, toPointTo: mapView)
+//    
+//    let pixelsInLatitude  = abs(px1.y - px2.y)
+//    let pixelsInLongitude = abs(px3.x - px4.x)
+//    
+//    let pixels = min(pixelsInLatitude, pixelsInLongitude)
+//    var meters = min(metersInLatitude, metersInLongitude)
+//    
+//    if meters == 0 {
+//      meters = 1.0
+//    }
+//    
+//    let pixelsPerMeter = pixels / meters
+//    
+//    let factor = pixelsPerMeter / scale.pointsPerMeter
+//    
+//    var latDelta = span.latitudeDelta * factor
+//    var lngDelta = span.longitudeDelta * factor
+//    
+//    // sanity check
+//    if latDelta.isNaN || lngDelta.isNaN {
+//      latDelta = span.latitudeDelta
+//      lngDelta = span.longitudeDelta
+//    }
+//
+//    print("latitudeDelta", latDelta, "longitudeDelta", lngDelta)
+//    
+//    return MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lngDelta)
   }
 
 }

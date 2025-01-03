@@ -45,8 +45,8 @@ open class W3WMapComponent: W3WMultiMapViewController, W3WMapProtocol {
   }
   
   
-  public init(w3w: W3WProtocolV4) {
-    viewModel = W3WMapViewModel(w3w: w3w)
+  public init(w3w: W3WProtocolV4, language: W3WLanguage = W3WBaseLanguage.english) {
+    viewModel = W3WMapViewModel(language: W3WLive<W3WLanguage?>(language), w3w: w3w)
     let view = W3WOldAppleMapView(viewModel: viewModel)
     super.init(view: view)
 
@@ -90,6 +90,9 @@ open class W3WMapComponent: W3WMultiMapViewController, W3WMapProtocol {
       
       case .marker(let square):
         onMarkerSelected(square)
+        
+      case .mapMove:
+        break
     }
   }
   
