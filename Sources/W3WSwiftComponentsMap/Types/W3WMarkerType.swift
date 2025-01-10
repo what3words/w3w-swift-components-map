@@ -1,8 +1,8 @@
 //
-//  File.swift
-//  
+//  W3WMarkerType.swift
 //
-//  Created by Khải Toàn Năng on 10/1/25.
+//
+//  Created by Khai Do on 10/1/25.
 //
 
 import Foundation
