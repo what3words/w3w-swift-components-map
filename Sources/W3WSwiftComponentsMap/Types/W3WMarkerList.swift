@@ -13,10 +13,10 @@ import Foundation
 public class W3WMarkerList: CustomStringConvertible {
   
   /// the colour of the markers in theis group
-  var color: W3WColor?
+  public var color: W3WColor?
   
   /// the list of squares to mark
-  var markers: [W3WSquare]
+  public var markers: [W3WSquare]
   
   
   /// a named, coloured, group of markers
