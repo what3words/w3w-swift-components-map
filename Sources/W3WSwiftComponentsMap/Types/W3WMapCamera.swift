@@ -40,12 +40,12 @@ public struct W3WMapCamera: Equatable, CustomStringConvertible {
   }
   
   
-  public func googleZoom() -> Double {
-    let zoom = 12.0
-    // math math
-    ///math(scale)
-    return zoom
-  }
+//  public func googleZoom() -> Float {
+//    let zoom = Float(12.0)
+//    // math math
+//    ///math(scale)
+//    return zoom
+//  }
   
   
   public var description: String {

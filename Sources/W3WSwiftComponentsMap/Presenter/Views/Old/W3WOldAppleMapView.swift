@@ -18,17 +18,22 @@ import W3WSwiftCoreSdk
 // FOR ZOOM LEVEL LOOK AT https://github.com/johndpope/MKMapViewZoom
 
 public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberProtocol, MKMapViewDelegate, UIGestureRecognizerDelegate {
-    
+  
   public var subscriptions = W3WEventsSubscriptions()
   
   public var viewModel: W3WMapViewModelProtocol
   
   public lazy var mapView = W3WMapView(frame: .w3wWhatever, w3w: viewModel.w3w)
-
+  
   public var types: [W3WMapType] { get { return [.standard, .satellite, .hybrid, "satelliteFlyover", "hybridFlyover", "mutedStandard"] } }
-
-  public init(viewModel: W3WMapViewModelProtocol) {
+  
+  var error: W3WEvent<W3WError>?
+  
+  
+  public init(viewModel: W3WMapViewModelProtocol, error: W3WEvent<W3WError>? = nil) {
     self.viewModel = viewModel
+    self.error = error
+    
     super.init(scheme: .w3w)
     configure()
   }
@@ -45,15 +50,16 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
     addSubview(mapView)
     //mapView.cameraZoomRange = MKMapView.CameraZoomRange(minCenterCoordinateDistance: 0.00001, maxCenterCoordinateDistance: 10000.0)
     set(type: .standard)
-
+    
     bind()
     attachTapRecognizer()
+    attachHoverRecognizer()
   }
   
   
-//  public func set(type: W3WMapType) {
-//    set(type: type.value)
-//  }
+  //  public func set(type: W3WMapType) {
+  //    set(type: type.value)
+  //  }
   
   
   func bind() {
@@ -68,36 +74,47 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
     let tap = UITapGestureRecognizer(target: self, action: #selector(tapped))
     tap.numberOfTapsRequired = 1
     tap.numberOfTouchesRequired = 1
-
+    
     // A kind of tricky thing to make sure double tap doesn't trigger single tap
     let doubleTap = UITapGestureRecognizer(target: self, action:nil)
     doubleTap.numberOfTapsRequired = 2
     mapView.addGestureRecognizer(doubleTap)
     tap.require(toFail: doubleTap)
-
+    
     // don't let the tap trickle through to the parent view
     //tap.cancelsTouchesInView = true
     
     tap.delegate = self
-
+    
     mapView.addGestureRecognizer(tap)
   }
-
+  
+  
+  func attachHoverRecognizer() {
+    //let hoverGesture = UIHoverGestureRecognizer(target: self, action: #selector(onHover(_:)))
+    //mapView.addGestureRecognizer(hoverGesture)
+  }
+  
+  
+  //@objc func onHover(_ gestureRecognizer : UITapGestureRecognizer) {
+  //  print("HOVER")
+  //}
+  
   
   /// when the user taps the map this is called and it gets the square info and sends it using the closure
   @objc func tapped(_ gestureRecognizer : UITapGestureRecognizer) {
     let location = gestureRecognizer.location(in: mapView)
     let coordinates = mapView.convert(location, toCoordinateFrom: mapView)
 
-    viewModel.w3w.convertTo3wa(coordinates: coordinates, language: viewModel.mapState.language.value ?? W3WBaseLanguage.english) { square, error in
+    viewModel.w3w.convertTo3wa(coordinates: coordinates, language: viewModel.mapState.language.value ?? W3WBaseLanguage.english) { [weak self] square, error in
       if let e = error {
         W3WThread.runOnMain {
-          print(e)
+          self?.error?.send(e)
         }
       }
       if let s = square {
         W3WThread.runOnMain {
-          self.viewModel.output.send(.selected(s))
+          self?.viewModel.output.send(.selected(s))
         }
       }
     }
@@ -130,6 +147,11 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   }
   
   
+  public func getCameraState() -> W3WMapCamera {
+    return W3WMapCamera(center: mapView.region.center, scale: W3WMapScale(span: mapView.region.span, mapSize: mapView.frame.size))
+  }
+
+  
   public func set(viewModel: W3WMapViewModelProtocol) {
     self.viewModel = viewModel
     
@@ -154,16 +176,20 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   
   
   func handle(mapCamera: W3WMapCamera?) {
-    if let center = mapCamera?.center, let scale = mapCamera?.scale {
-      let region = MKCoordinateRegion(center: center, span: W3WMapScale.scaleToSpan(scale: scale, mapView: mapView))
-      mapView.setRegion(region, animated: true)
-      
-    } else if let center = mapCamera?.center {
-      mapView.setCenter(center, animated: true)
-      
-    } else if let scale = mapCamera?.scale {
-      let region = MKCoordinateRegion(center: mapView.centerCoordinate, span: W3WMapScale.scaleToSpan(scale: scale, mapView: mapView))
-      mapView.setRegion(region, animated: true)
+    W3WThread.runOnMain { [weak self] in
+      if let self = self {
+        if let center = mapCamera?.center, let scale = mapCamera?.scale {
+          let region = MKCoordinateRegion(center: center, span: scale.asSpan(mapSize: frame.size, latitude: center.latitude))
+          mapView.setRegion(region, animated: true)
+          
+        } else if let center = mapCamera?.center {
+          mapView.setCenter(center, animated: true)
+          
+        } else if let scale = mapCamera?.scale {
+          let region = MKCoordinateRegion(center: mapView.centerCoordinate, span: scale.asSpan(mapSize: frame.size, latitude: mapCamera?.center?.latitude ?? 0.0))
+          mapView.setRegion(region, animated: true)
+        }
+      }
     }
   }
   
@@ -174,7 +200,7 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   // Tells the delegate when the map view’s visible region changes.
   public func mapViewDidChangeVisibleRegion(_: MKMapView) {
     //viewModel.mapState.camera.send(makeW3WMapCameraFromMapView())
-    viewModel.output.send(.mapMove)
+    //viewModel.output.send(.mapMove)
   }
 
 
@@ -191,24 +217,24 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
 
   
   // given a W3WMapCamera, make a MKMapCamera
-  func mkMapCameraFromW3WCamera(camera: W3WMapCamera?) -> MKMapCamera {
-    return MKMapCamera(
-      lookingAtCenter: camera?.center ?? mapView.centerCoordinate,
-      fromDistance: Double(camera?.scale?.pointsPerMeter ?? 1.0),
-      pitch: camera?.pitch?.degrees ?? 0.0,
-      heading: camera?.angle?.degrees ?? 0.0
-    )
-  }
+//  func mkMapCameraFromW3WCamera(camera: W3WMapCamera?) -> MKMapCamera {
+//    return MKMapCamera(
+//      lookingAtCenter: camera?.center ?? mapView.centerCoordinate,
+//      fromDistance: Double(camera?.scale?.pointsPerMeter ?? 1.0),
+//      pitch: camera?.pitch?.degrees ?? 0.0,
+//      heading: camera?.angle?.degrees ?? 0.0
+//    )
+//  }
   
   
-  func makeW3WMapCameraFromMapView() -> W3WMapCamera {
-    return W3WMapCamera(
-      center: mapView.camera.centerCoordinate,
-      scale: 10.0,
-      angle: W3WAngle(degrees: mapView.camera.heading),
-      pitch: W3WAngle(degrees: mapView.camera.pitch)
-    )
-  }
+//  func makeW3WMapCameraFromMapView() -> W3WMapCamera {
+//    return W3WMapCamera(
+//      center: mapView.camera.centerCoordinate,
+//      scale: 10.0,
+//      angle: W3WAngle(degrees: mapView.camera.heading),
+//      pitch: W3WAngle(degrees: mapView.camera.pitch)
+//    )
+//  }
   
   
   public override func layoutSubviews() {

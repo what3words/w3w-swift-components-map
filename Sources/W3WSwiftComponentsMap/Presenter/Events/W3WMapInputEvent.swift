@@ -11,8 +11,9 @@ import W3WSwiftCore
 
 public enum W3WMapInputEvent {
 
-  case center(W3WSquare, W3WMapScale?)
-  case selected(W3WSquare?)
-  case markers(W3WMarkersLists)
+ // case noop
+//  case center(W3WSquare, W3WMapScale?)
+//  case selected(W3WSquare?)
+//  case markers(W3WMarkersLists)
   
 }

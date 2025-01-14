@@ -21,6 +21,8 @@ public protocol W3WMapViewProtocol: UIView {
   
   func getType() -> W3WMapType
   
+  func getCameraState() -> W3WMapCamera
+  
   func pointFor(coordinate: CLLocationCoordinate2D) -> CGPoint
   
   func coordinateFor(point: CGPoint) -> CLLocationCoordinate2D

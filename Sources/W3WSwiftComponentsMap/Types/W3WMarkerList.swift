@@ -26,6 +26,11 @@ public class W3WMarkerList: CustomStringConvertible {
   }
   
   
+  public func getMarkers() -> [W3WSquare] {
+    return markers
+  }
+  
+  
   /// as a string
   public var description: String {
     var retval = ""
