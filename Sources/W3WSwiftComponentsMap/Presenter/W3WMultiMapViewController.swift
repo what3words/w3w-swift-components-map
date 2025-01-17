@@ -96,6 +96,7 @@ open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProto
   
   open func handle(theme: W3WTheme?) {
     set(theme: theme)
+    mapView?.set(scheme: theme?.mapScheme())
   }
   
   

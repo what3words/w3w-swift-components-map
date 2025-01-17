@@ -90,6 +90,9 @@ open class W3WMapComponent: W3WMultiMapViewController, W3WMapProtocol {
       case .selected(let square):
         onSquareSelected(square)
       
+      case .camera:
+        break
+        
       //case .marker(let square):
       //  onMarkerSelected(square)
         

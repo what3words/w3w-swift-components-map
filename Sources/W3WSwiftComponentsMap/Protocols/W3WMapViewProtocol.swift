@@ -7,6 +7,8 @@
 
 import UIKit
 import CoreLocation
+import W3WSwiftCore
+import W3WSwiftThemes
 
 
 public protocol W3WMapViewProtocol: UIView {
@@ -15,9 +17,13 @@ public protocol W3WMapViewProtocol: UIView {
   
   var types: [W3WMapType] { get }
   
+  var transitionScale: W3WMapScale { get set }
+  
   func set(viewModel: W3WMapViewModelProtocol)
   
   func set(type: String)
+  
+  func set(scheme: W3WScheme?)
   
   func getType() -> W3WMapType
   

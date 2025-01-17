@@ -26,7 +26,10 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   public lazy var mapView = W3WMapView(frame: .w3wWhatever, w3w: viewModel.w3w)
   
   public var types: [W3WMapType] { get { return [.standard, .satellite, .hybrid, "satelliteFlyover", "hybridFlyover", "mutedStandard"] } }
-  
+
+  /// the point at which annotations turn into overlay drawing when zoomed closer into
+  public var transitionScale = W3WMapScale(pointsPerMeter: 4.0)
+
   var error: W3WEvent<W3WError>?
   
   
@@ -201,6 +204,7 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   public func mapViewDidChangeVisibleRegion(_: MKMapView) {
     //viewModel.mapState.camera.send(makeW3WMapCameraFromMapView())
     //viewModel.output.send(.mapMove)
+    viewModel.output.send(.camera(getCameraState()))
   }
 
 

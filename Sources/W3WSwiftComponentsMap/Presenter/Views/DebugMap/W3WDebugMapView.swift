@@ -22,6 +22,9 @@ public class W3WDebugMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
   
   public var types: [W3WMapType] { get { return ["Muted Standard"] } }
 
+  /// the point at which annotations turn into overlay drawing when zoomed closer into
+  public var transitionScale = W3WMapScale(pointsPerMeter: 4.0)
+  
   var mapView = MKMapView(frame: .w3wWhatever)
   
   var selected  = W3WLabel(scheme: .w3w.with(border: .lightBlue, thickness: 0.5))

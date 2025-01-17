@@ -11,6 +11,8 @@ import W3WSwiftCore
 
 public enum W3WMapInputEvent {
 
+//  case zoomTransitionLevel(W3WMapScale)
+  
  // case noop
 //  case center(W3WSquare, W3WMapScale?)
 //  case selected(W3WSquare?)
