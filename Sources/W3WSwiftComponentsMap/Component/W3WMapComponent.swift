@@ -37,7 +37,7 @@ open class W3WMapComponent: W3WMultiMapViewController, W3WMapProtocol {
   }
   
 
-  private override init(view: W3WMapViewProtocol, keepAlive: [Any?] = []) {
+  private override init(view: W3WMapViewProtocol, theme: W3WLive<W3WTheme?>?, keepAlive: [Any?] = []) {
     super.init(view: view)
     viewModel = view.viewModel
     
@@ -46,7 +46,8 @@ open class W3WMapComponent: W3WMultiMapViewController, W3WMapProtocol {
   
   
   public init(w3w: W3WProtocolV4, language: W3WLanguage = W3WBaseLanguage.english) {
-    viewModel = W3WMapViewModel(language: W3WLive<W3WLanguage?>(language), w3w: w3w)
+    let mapState = W3WMapState(language: W3WLive<W3WLanguage?>(language))
+    viewModel = W3WMapViewModel(mapState: mapState, w3w: w3w)
     let view = W3WOldAppleMapView(viewModel: viewModel)
     super.init(view: view)
 
@@ -55,7 +56,8 @@ open class W3WMapComponent: W3WMultiMapViewController, W3WMapProtocol {
 
   
   required public init?(coder: NSCoder) {
-    viewModel = W3WMapViewModel(w3w: W3WDummyApi()) // instantiate with a fake API, and set the real one after to get around a catch-22
+    let mapState = W3WMapState(language: W3WLive<W3WLanguage?>(W3WBaseLanguage.english))
+    viewModel = W3WMapViewModel(mapState: mapState, w3w: W3WDummyApi()) // instantiate with a fake API, and set the real one after to get around a catch-22
     let view = W3WOldAppleMapView(viewModel: viewModel)
     super.init(view: view)
 
@@ -67,9 +69,9 @@ open class W3WMapComponent: W3WMultiMapViewController, W3WMapProtocol {
     subscribe(to: viewModel.output) { [weak self] event in
       self?.handle(event: event)
     }
-    subscribe(to: viewModel.mapState.error) { [weak self] error in
-      self?.handle(error: error)
-    }
+    //subscribe(to: viewModel.mapState.error) { [weak self] error in
+    //  self?.handle(error: error)
+    //}
   }
   
   
@@ -88,11 +90,14 @@ open class W3WMapComponent: W3WMultiMapViewController, W3WMapProtocol {
       case .selected(let square):
         onSquareSelected(square)
       
-      case .marker(let square):
-        onMarkerSelected(square)
-        
-      case .mapMove:
+      case .camera:
         break
+        
+      //case .marker(let square):
+      //  onMarkerSelected(square)
+        
+      //case .mapMove:
+      //  break
     }
   }
   

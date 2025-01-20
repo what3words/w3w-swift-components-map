@@ -13,7 +13,7 @@ public protocol W3WMapStateProtocol {
 
   var language: W3WLive<W3WLanguage?> { get set }
   
-  var scheme: W3WLive<W3WScheme?> { get set }
+  //var scheme: W3WLive<W3WScheme?> { get set }
   
   var markers: W3WLive<W3WMarkersLists> { get set }
   
@@ -23,13 +23,7 @@ public protocol W3WMapStateProtocol {
 
   var camera: W3WEvent<W3WMapCamera?> { get set }
   
-  var error: W3WEvent<W3WError?> { get set }
-
-  
-  func send(scale: Double?)
-  func send(scale: W3WMapScale?)
-  func send(center: CLLocationCoordinate2D?)
-  func send(pitch: W3WAngle?)
+  //var error: W3WEvent<W3WError?> { get set }
 
 }
 
@@ -38,7 +32,7 @@ public extension W3WMapStateProtocol {
   static var defautGroupName: String { get { return "default" } }
 
   func loadValues(state: W3WMapStateProtocol) {
-    self.scheme.send(state.scheme.value)
+    //self.scheme.send(state.scheme.value)
     self.markers.send(state.markers.value)
     self.selected.send(state.selected.value)
     self.hovered.send(state.hovered.value)

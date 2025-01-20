@@ -24,10 +24,14 @@ open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProto
   
   
   /// Holds an interchangable map view
-  public init(view: W3WMapViewProtocol, keepAlive: [Any?] = []) {
+  public init(view: W3WMapViewProtocol, theme: W3WLive<W3WTheme?>? = nil, keepAlive: [Any?] = []) {
     self.keepAlive = keepAlive
     
-    super.init()
+    super.init(theme: theme?.value)
+    
+    subscribe(to: theme) { [weak self] theme in
+      self?.handle(theme: theme)
+    }
 
     // set the initial map view
     set(mapView: view)
@@ -53,6 +57,9 @@ open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProto
 
   /// sets a map view for this view controller
   open func set(mapView: W3WMapViewProtocol) {
+    let mapCamera = self.mapView?.getCameraState()
+    print(self.mapView is W3WOldAppleMapView ? "🗺️ apple" : "🗺️ google", mapCamera?.description ?? "?")
+    
     // transfer the viewModel from the current view to the new one
     if let oldVm = self.mapView?.viewModel {
       mapView.set(viewModel: oldVm)
@@ -77,6 +84,19 @@ open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProto
       self.view.addSubview(mapView)
       view.sendSubviewToBack(mapView)
     }
+    
+    if let camera = mapCamera {
+      mapView.viewModel.mapState.camera.send(camera)
+    }
+  }
+  
+  
+  // MARK: Event Handlers
+  
+  
+  open func handle(theme: W3WTheme?) {
+    set(theme: theme)
+    mapView?.set(scheme: theme?.mapScheme())
   }
   
   

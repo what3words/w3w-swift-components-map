@@ -159,36 +159,36 @@ public extension W3WMapProtocol {
   }
   
   func set(center: W3WSquare?) {
-    state.send(center: center?.coordinates)
+    //state.send(center: center?.coordinates)
   }
  
   func set(center: W3WSuggestion?) {
     if let words = center?.words {
       w3w.convertToCoordinates(words: words) { square, error in
-        self.state.send(center: square?.coordinates)
+        //self.state.send(center: square?.coordinates)
       }
     } else {
-      self.state.send(center: nil)
+      //self.state.send(center: nil)
     }
   }
  
   func set(center: String?) {
     if let words = center {
       w3w.convertToCoordinates(words: words) { square, error in
-        self.state.send(center: square?.coordinates)
+        //self.state.send(center: square?.coordinates)
       }
     } else {
-      self.state.send(center: nil)
+      //self.state.send(center: nil)
     }
   }
  
   func set(center: CLLocationCoordinate2D?, language: W3WLanguage) {
     if let coordinates = center {
       w3w.convertTo3wa(coordinates: coordinates, language: language) { square, error in
-        self.state.send(center: square?.coordinates)
+        //self.state.send(center: square?.coordinates)
       }
     } else {
-      self.state.send(center: nil)
+      //self.state.send(center: nil)
     }
   }
  
