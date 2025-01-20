@@ -25,12 +25,17 @@ public class W3WMarkersLists: CustomStringConvertible {
   }
 
   
+  public func getLists() -> [String: W3WMarkerList] {
+    return lists
+  }
+  
+  
   /// add a marker list to these groups
   /// - Parameters:
   ///   - group: the name of the group to add
   ///   - color: the color for the group
   /// - Returns: true if added successfully, false if there is already a group named that
-  public func add(listName: String, color: W3WColor) -> Bool {
+  @discardableResult public func add(listName: String, color: W3WColor) -> Bool {
     if lists[listName] != nil {
       return false
     }
@@ -44,7 +49,7 @@ public class W3WMarkersLists: CustomStringConvertible {
   /// - Parameters:
   ///   - group: the name of the group to add
   /// - Returns: true if removed successfully, false if there is no group named that
-  public func remove(listName: String) -> Bool {
+  @discardableResult public func remove(listName: String) -> Bool {
     guard let _ = lists[listName] else { return false }
     lists[listName] = nil
     return true
@@ -56,7 +61,7 @@ public class W3WMarkersLists: CustomStringConvertible {
   ///   - group: the name of the group to add to
   ///   - square: the square to add
   /// - Returns: true if added successfully, false if no such group exists
-  public func add(square: W3WSquare, listName: String? = nil) -> Bool {
+  @discardableResult public func add(square: W3WSquare, listName: String? = nil) -> Bool {
     if let list = lists[listName ?? defaultName] {
       list.markers.append(square)
       return true
@@ -82,7 +87,7 @@ public class W3WMarkersLists: CustomStringConvertible {
   ///   - group: the name of the group to add to
   ///   - square: the square to add
   /// - Returns: true if removed successfully, false if no such group exists, or square wasn't there
-  public func remove(square: W3WSquare, listName: String) -> Bool {
+  @discardableResult public func remove(square: W3WSquare, listName: String) -> Bool {
     guard let _ = lists[listName] else { return false }
     guard let _ = lists[listName]?.markers.first(where: { s in s.coordinates?.latitude == square.coordinates?.latitude }) else { return false }
     lists[listName]?.markers.removeAll(where: { s in s.coordinates?.latitude == square.coordinates?.latitude })

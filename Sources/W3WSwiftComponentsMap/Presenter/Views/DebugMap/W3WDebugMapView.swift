@@ -22,6 +22,9 @@ public class W3WDebugMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
   
   public var types: [W3WMapType] { get { return ["Muted Standard"] } }
 
+  /// the point at which annotations turn into overlay drawing when zoomed closer into
+  public var transitionScale = W3WMapScale(pointsPerMeter: 4.0)
+  
   var mapView = MKMapView(frame: .w3wWhatever)
   
   var selected  = W3WLabel(scheme: .w3w.with(border: .lightBlue, thickness: 0.5))
@@ -93,20 +96,23 @@ public class W3WDebugMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
     subscribe(to: viewModel.mapState.camera) { [weak self] camera in
       self?.handle(mapCamera: camera)
     }
-    subscribe(to: viewModel.mapState.scheme) { [weak self] scheme in
-      self?.set(scheme: scheme)
-      self?.selected.set(scheme: scheme?.with(border: .lightBlue, thickness: 0.5))
-      self?.hovered.set(scheme: scheme?.with(border: .lightBlue, thickness: 0.5))
-      self?.markers.set(scheme: scheme?.with(border: .lightBlue, thickness: 0.5))
-      self?.mapCamera.set(scheme: scheme?.with(border: .lightBlue, thickness: 0.5))
-    }
-    subscribe(to: viewModel.mapState.error) { [weak self] error in
-      self?.handle(error: error)
-    }
+    //subscribe(to: viewModel.mapState.scheme) { [weak self] scheme in
+    //  self?.set(scheme: scheme)
+    //  self?.selected.set(scheme: scheme?.with(border: .lightBlue, thickness: 0.5))
+    //  self?.hovered.set(scheme: scheme?.with(border: .lightBlue, thickness: 0.5))
+    //  self?.markers.set(scheme: scheme?.with(border: .lightBlue, thickness: 0.5))
+    //  self?.mapCamera.set(scheme: scheme?.with(border: .lightBlue, thickness: 0.5))
+    //}
+    //subscribe(to: viewModel.mapState.error) { [weak self] error in
+    //  self?.handle(error: error)
+    //}
     
-    viewModel.mapState.error.send(W3WError.message("Error: Ha ha ha"))
+    //viewModel.mapState.error.send(W3WError.message("Error: Ha ha ha"))
   }
  
+  
+  // MARK: Accessors
+  
   
   public func set(viewModel: W3WMapViewModelProtocol) {
     self.viewModel = viewModel
@@ -125,6 +131,11 @@ public class W3WDebugMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
   }
   
 
+  public func getCameraState() -> W3WMapCamera {
+    return W3WMapCamera()
+  }
+  
+  
   // MARK: Event Handlers
   
   

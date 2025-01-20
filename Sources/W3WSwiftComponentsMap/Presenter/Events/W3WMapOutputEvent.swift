@@ -11,7 +11,8 @@ import W3WSwiftCore
 public enum W3WMapOutputEvent {
   
   case selected(W3WSquare)
-  case marker(W3WSquare)
-  case mapMove //(W3WBox)
+  case camera(W3WMapCamera)
+  //case marker(W3WSquare)
+  //case mapMove //(W3WBox)
   
 }

@@ -1,4 +1,5 @@
 import XCTest
+import MapKit
 import CoreLocation
 import W3WSwiftCore
 @testable import W3WSwiftComponentsMap
@@ -53,4 +54,34 @@ final class w3w_swift_components_mapTests: XCTestCase {
     XCTAssertFalse(lists.remove(square: filledCountSoap, listName: "fun"))
   }
     
+  func testScale() {
+    let scalePpm = W3WMapScale(pointsPerMeter: 10.0)
+    XCTAssertEqual(scalePpm.value, 10.0)
+
+    //let googleZoom = scalePpm.asGoogleZoom(latitude: 90.0)
+    
+    //let scaleGoogle = W3WMapScale(googleZoom: googleZoom, latitude: W3WAngle(degrees: 90.0))
+    //print(scaleGoogle.value)
+  }
+  
+  
+  func testAppleMapSpan() {
+    let span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+        
+    let screenSize = CGSize(width: 414, height: 896)
+    let ams = W3WMapScale(span: span, mapSize: screenSize)
+    print(ams.asSpan(mapSize: screenSize, latitude: 80.0))
+  }
+  
+
+  /// test google zoom conversion to points per meter and back again
+  func testGoogleZoom() {
+    for i in stride(from: 1.0, to: 25, by: 0.1) {
+      let zoom = W3WMapScale(googleZoom: Float(i))
+      XCTAssertEqual(zoom.googleZoom, Float(i), accuracy: 0.000001)
+      print(zoom.googleZoom, zoom.value)
+    }
+  }
+  
+  
 }
