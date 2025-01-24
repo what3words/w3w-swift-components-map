@@ -133,9 +133,6 @@ public struct W3WMapScale: Equatable, ExpressibleByFloatLiteral, CustomStringCon
   ///   - span: the MKMapView span value
   ///   - mapSize: the size of the map view in points
   public static func spanToPointsPerMeter(span: MKCoordinateSpan, mapSize: CGSize) -> Double {
-    // Earth's radius in meters
-    //let earthRadius: Double = 6371000.0
-
     // Calculate the vertical distance (latitude delta to meters)
     let latitudeDelta = span.latitudeDelta
     let verticalMeters = (latitudeDelta / 360.0) * 2 * .pi * earthRadius.meters
@@ -158,9 +155,6 @@ public struct W3WMapScale: Equatable, ExpressibleByFloatLiteral, CustomStringCon
   ///   - mapSize: the size of the map view in points
   ///   - latitude: the latitude of the region
   public static func pointsPerMeterToSpan(pointsPerMeter: Double, mapSize: CGSize, latitude: Double) -> MKCoordinateSpan {
-    // Earth's radius in meters
-    //let earthRadius: Double = 6_371_000.0
-
     // Vertical span (latitudeDelta)
     let verticalMeters = mapSize.height / pointsPerMeter
     let latitudeDelta = (verticalMeters * 360) / (2 * .pi * earthRadius.meters)

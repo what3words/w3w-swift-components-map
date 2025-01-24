@@ -6,13 +6,22 @@
 //
 
 import W3WSwiftCore
+import W3WSwiftAppEvents
 
 
-public enum W3WMapOutputEvent {
+public enum W3WMapOutputEvent: W3WAppEventConvertable {
   
   case selected(W3WSquare)
   case camera(W3WMapCamera)
-  //case marker(W3WSquare)
-  //case mapMove //(W3WBox)
+  //case button(name: String, parameter: String?)
+
   
+  public func asAppEvent() -> W3WAppEvent {
+    switch self {
+      case .selected(let square): return W3WAppEvent(type: Self.self, name: .squareSelected, parameters: ["selected": .square(square)])
+      case .camera(let camera): return W3WAppEvent(type: Self.self, name: "camera", parameters: ["camera": .text(camera.description)])
+      //case .button(name: let name, parameter: let parameter): return W3WAppEvent(type: Self.self, name: "button", parameters: ["name": .text(name), "parameter": .text(parameter)])
+    }
+  }
+
 }

@@ -20,7 +20,7 @@ public class W3WDebugMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
   
   public var viewModel: W3WMapViewModelProtocol
   
-  public var types: [W3WMapType] { get { return ["Muted Standard"] } }
+  public var types: [W3WMapType] { get { return ["mutedStandard"] } }
 
   /// the point at which annotations turn into overlay drawing when zoomed closer into
   public var transitionScale = W3WMapScale(pointsPerMeter: 4.0)
@@ -182,6 +182,7 @@ public class W3WDebugMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
   public func pointFor(coordinate: CLLocationCoordinate2D) -> CGPoint {
     return mapView.convert(coordinate, toPointTo: nil)
   }
+  
   
   public func coordinateFor(point: CGPoint) -> CLLocationCoordinate2D {
     return mapView.convert(point, toCoordinateFrom: nil)

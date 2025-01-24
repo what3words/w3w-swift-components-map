@@ -9,6 +9,7 @@ import MapKit
 import W3WSwiftCore
 import W3WSwiftDesign
 import W3WSwiftComponents
+import W3WSwiftComponentsMap
 
 
 #if canImport(W3WSwiftCoreSdk)

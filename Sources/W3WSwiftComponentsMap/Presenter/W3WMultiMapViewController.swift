@@ -58,7 +58,6 @@ open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProto
   /// sets a map view for this view controller
   open func set(mapView: W3WMapViewProtocol) {
     let mapCamera = self.mapView?.getCameraState()
-    print(self.mapView is W3WOldAppleMapView ? "🗺️ apple" : "🗺️ google", mapCamera?.description ?? "?")
     
     // transfer the viewModel from the current view to the new one
     if let oldVm = self.mapView?.viewModel {

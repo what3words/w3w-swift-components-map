@@ -10,7 +10,7 @@ import W3WSwiftCore
 import W3WSwiftThemes
 
 
-public class W3WMapViewModel: W3WMapViewModelProtocol, W3WEventSubscriberProtocol {
+open class W3WMapViewModel: W3WMapViewModelProtocol, W3WEventSubscriberProtocol {
   public var subscriptions = W3WEventsSubscriptions()
   
   public var input = W3WEvent<W3WMapInputEvent>()

@@ -92,11 +92,8 @@ open class W3WMapComponent: W3WMultiMapViewController, W3WMapProtocol {
       
       case .camera:
         break
-        
-      //case .marker(let square):
-      //  onMarkerSelected(square)
-        
-      //case .mapMove:
+
+      //case .button(name: let name, parameter: let param):
       //  break
     }
   }
