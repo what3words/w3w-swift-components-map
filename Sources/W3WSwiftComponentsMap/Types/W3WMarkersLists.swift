@@ -5,6 +5,7 @@
 //  Created by Dave Duprey on 04/12/2024.
 //
 
+import CoreLocation
 import W3WSwiftCore
 import W3WSwiftThemes
 
@@ -15,7 +16,7 @@ public class W3WMarkersLists: CustomStringConvertible {
   
   var defaultColour: W3WColor
 
-  var defaultName = "default"
+  public var defaultName = "default"
 
   
   /// a named, coloured, group of markers
@@ -87,13 +88,50 @@ public class W3WMarkersLists: CustomStringConvertible {
   ///   - group: the name of the group to add to
   ///   - square: the square to add
   /// - Returns: true if removed successfully, false if no such group exists, or square wasn't there
-  @discardableResult public func remove(square: W3WSquare, listName: String) -> Bool {
+  @discardableResult public func remove(words: String, listName: String? = nil) -> Bool {
+    let listName: String = listName ?? defaultName
+    
     guard let _ = lists[listName] else { return false }
-    guard let _ = lists[listName]?.markers.first(where: { s in s.coordinates?.latitude == square.coordinates?.latitude }) else { return false }
-    lists[listName]?.markers.removeAll(where: { s in s.coordinates?.latitude == square.coordinates?.latitude })
+    guard let _ = lists[listName]?.markers.first(where: { s in s.words == words }) else { return false }
+    lists[listName]?.markers.removeAll(where: { s in s.words == words })
+
     return true
   }
+
   
+  /// remove a square from a group
+  /// - Parameters:
+  ///   - group: the name of the group to add to
+  ///   - square: the square to add
+  /// - Returns: true if removed successfully, false if no such group exists, or square wasn't there
+  @discardableResult public func remove(coordinates: CLLocationCoordinate2D?, listName: String? = nil) -> Bool {
+    let listName: String = listName ?? defaultName
+    
+    guard let _ = lists[listName] else { return false }
+    guard let _ = lists[listName]?.markers.first(where: { s in s.coordinates?.latitude == coordinates?.latitude }) else { return false }
+    lists[listName]?.markers.removeAll(where: { s in s.coordinates?.latitude == coordinates?.latitude })
+
+    return true
+  }
+
+  
+  /// remove a square from a group
+  /// - Parameters:
+  ///   - group: the name of the group to add to
+  ///   - square: the square to add
+  /// - Returns: true if removed successfully, false if no such group exists, or square wasn't there
+  @discardableResult public func remove(square: W3WSquare, listName: String? = nil) -> Bool {
+    if let words = square.words {
+      return remove(words: words, listName: listName)
+
+    } else if let coordinates = square.coordinates {
+      return remove(coordinates: coordinates, listName: listName)
+
+    } else {
+      return false
+    }
+  }
+
   
   /// as a string
   public var description: String {

@@ -13,14 +13,14 @@ public enum W3WMapOutputEvent: W3WAppEventConvertable {
   
   case selected(W3WSquare)
   case camera(W3WMapCamera)
-  //case button(name: String, parameter: String?)
+  case error(W3WError)
 
   
   public func asAppEvent() -> W3WAppEvent {
     switch self {
       case .selected(let square): return W3WAppEvent(type: Self.self, name: .squareSelected, parameters: ["selected": .square(square)])
       case .camera(let camera): return W3WAppEvent(type: Self.self, name: "camera", parameters: ["camera": .text(camera.description)])
-      //case .button(name: let name, parameter: let parameter): return W3WAppEvent(type: Self.self, name: "button", parameters: ["name": .text(name), "parameter": .text(parameter)])
+      case .error(let error): return W3WAppEvent(type: Self.self, name: "error", parameters: [.error(error)])
     }
   }
 

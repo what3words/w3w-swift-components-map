@@ -60,6 +60,7 @@ extension W3WMapViewProtocol {
   }
   
   
+  @available(*, deprecated, message: "Now a function of W3WMapScale - gridLineThickness")
   func lineWidth(scale: W3WMapScale) -> W3WLineThickness {
     var v = 1.9623 * exp(-0.077 * (scale.value - 1.0))
     

@@ -31,13 +31,19 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   /// the point at which annotations turn into overlay drawing when zoomed closer into
   public var transitionScale = W3WMapScale(pointsPerMeter: 4.0)
 
-  var error: W3WEvent<W3WError>?
+  //var error: W3WEvent<W3WError>?
   
   
-  public init(viewModel: W3WMapViewModelProtocol, error: W3WEvent<W3WError>? = nil) {
+  public init(viewModel: W3WMapViewModelProtocol) { //}, error: W3WEvent<W3WError>? = nil) {
     self.viewModel = viewModel
-    self.error = error
-    
+    super.init(scheme: .w3w)
+    configure()
+  }
+  
+  
+  public init(w3w: W3WProtocolV4, language: W3WLanguage) {
+    let mapState = W3WMapState(language: W3WLive<W3WLanguage?>(language))
+    self.viewModel = W3WMapViewModel(mapState: mapState, w3w: w3w, gps: W3WLive<W3WSquare?>(nil))
     super.init(scheme: .w3w)
     configure()
   }
@@ -52,7 +58,6 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
     set(viewModel: viewModel)
     mapView.delegate = self
     addSubview(mapView)
-    //mapView.cameraZoomRange = MKMapView.CameraZoomRange(minCenterCoordinateDistance: 0.00001, maxCenterCoordinateDistance: 10000.0)
     set(type: .standard)
     
     bind()
@@ -69,6 +74,7 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   func bind() {
     subscribe(to: viewModel.mapState.camera) { [weak self] camera in self?.handle(mapCamera: camera) }
     subscribe(to: viewModel.mapState.markers) { [weak self] markers in self?.handle(markers: markers) }
+    subscribe(to: viewModel.mapState.selected) { [weak self] selected in self?.handle(selected: selected) }
   }
   
   
@@ -113,7 +119,8 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
     viewModel.w3w.convertTo3wa(coordinates: coordinates, language: viewModel.mapState.language.value ?? W3WBaseLanguage.english) { [weak self] square, error in
       if let e = error {
         W3WThread.runOnMain {
-          self?.error?.send(e)
+          //self?.error?.send(e)
+          self?.viewModel.output.send(.error(e))
         }
       }
       if let s = square {
@@ -158,14 +165,15 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   
   public func set(viewModel: W3WMapViewModelProtocol) {
     self.viewModel = viewModel
-    
-    subscribe(to: viewModel.mapState.camera)   { [weak self] camera in self?.handle(mapCamera: camera) }
-    subscribe(to: viewModel.mapState.selected) { [weak self] square in self?.handle(selected: square) }
+    bind()
+    mapView.set(viewModel.w3w)
+    //subscribe(to: viewModel.mapState.camera)   { [weak self] camera in self?.handle(mapCamera: camera) }
+    //subscribe(to: viewModel.mapState.selected) { [weak self] square in self?.handle(selected: square) }
   }
   
   
   func handle(selected: W3WSquare?) {
-    //mapView.addMarker(at: selected)
+    mapView.addMarker(at: selected, camera: .none)
   }
   
   
@@ -203,9 +211,12 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   
   // Tells the delegate when the map view’s visible region changes.
   public func mapViewDidChangeVisibleRegion(_: MKMapView) {
-    //viewModel.mapState.camera.send(makeW3WMapCameraFromMapView())
-    //viewModel.output.send(.mapMove)
     viewModel.output.send(.camera(getCameraState()))
+    
+    let currentMapScale = W3WMapScale(span: mapView.region.span, mapSize: mapView.frame.size)
+    if transitionScale.value < currentMapScale.value {
+      
+    }
   }
 
 

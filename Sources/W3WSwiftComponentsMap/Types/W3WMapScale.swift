@@ -13,6 +13,7 @@
 import CoreGraphics
 import MapKit
 import W3WSwiftCore
+import W3WSwiftDesign
 
 
 /// Stores an internal value representing map scale
@@ -169,6 +170,32 @@ public struct W3WMapScale: Equatable, ExpressibleByFloatLiteral, CustomStringCon
     // Return the span
     return MKCoordinateSpan(latitudeDelta: minSpan, longitudeDelta: minSpan)
   }
+  
+  
+
+  public func squareLineThickness() -> W3WLineThickness {
+    var v = 1.9623 * exp(-0.077 * (value - 1.0))
+    
+    v = min(v, 2.0)
+    v = max(v, 0.5)
+    
+    v = round(v * 2.0)
+    
+    return W3WLineThickness(value: v)
+  }
+  
+  
+  public func gridLineThickness() -> W3WLineThickness {
+    var v = 1.9623 * exp(-0.077 * (value - 1.0))
+    
+    v = min(v, 2.0)
+    v = max(v, 0.5)
+    
+    v = round(v * 2.0) / 2.0
+    
+    return W3WLineThickness(value: v)
+  }
+  
   
 }
 
