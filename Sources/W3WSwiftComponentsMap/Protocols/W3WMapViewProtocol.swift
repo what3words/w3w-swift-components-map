@@ -58,5 +58,19 @@ extension W3WMapViewProtocol {
   public func coordinateFor(point: CGPoint) -> CLLocationCoordinate2D {
     return CLLocationCoordinate2D(latitude: 51.0, longitude: -0.1)
   }
+  
+  
+  @available(*, deprecated, message: "Now a function of W3WMapScale - gridLineThickness")
+  func lineWidth(scale: W3WMapScale) -> W3WLineThickness {
+    var v = 1.9623 * exp(-0.077 * (scale.value - 1.0))
+    
+    v = min(v, 2.0)
+    v = max(v, 0.5)
+    
+    v = round(v * 2.0) / 2.0
+    
+    return W3WLineThickness(value: v)
+  }
+  
 
 }

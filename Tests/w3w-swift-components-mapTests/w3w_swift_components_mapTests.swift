@@ -84,4 +84,21 @@ final class w3w_swift_components_mapTests: XCTestCase {
   }
   
   
+  func testLineThickness() {
+    let mapView = W3WMockMapView()
+    
+    for i in stride(from: 17.0, to: 25.0, by: 1.0) {
+      let scale = W3WMapScale(googleZoom: Float(i))
+      print(i, scale.googleZoom, mapView.lineWidth(scale: scale))
+    }
+
+    // we use a formula to approximate the specs in figma, this means values 19, 20, & 22 are a touch off
+    XCTAssertEqual(0.5, mapView.lineWidth(scale: W3WMapScale(googleZoom: 25)).value, accuracy: 0.001)
+    XCTAssertEqual(0.5, mapView.lineWidth(scale: W3WMapScale(googleZoom: 24)).value, accuracy: 0.001)
+    XCTAssertEqual(0.5, mapView.lineWidth(scale: W3WMapScale(googleZoom: 23)).value, accuracy: 0.001)
+    XCTAssertEqual(1.0, mapView.lineWidth(scale: W3WMapScale(googleZoom: 21)).value, accuracy: 0.001)
+    XCTAssertEqual(2.0, mapView.lineWidth(scale: W3WMapScale(googleZoom: 18)).value, accuracy: 0.001)
+  }
+  
+  
 }

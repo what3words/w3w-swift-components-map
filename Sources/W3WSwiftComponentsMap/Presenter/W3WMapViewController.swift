@@ -13,11 +13,11 @@ import W3WSwiftDesign
 
 
 /// Holds an interchangable map view
-open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProtocol {
+open class W3WMapViewController: W3WViewController, W3WEventSubscriberProtocol {
   public var subscriptions = W3WEventsSubscriptions()
   
   /// keeps a reference to objects to keep them alive and release them on destruction
-  var keepAlive: [Any?]
+  var keepAlive = [Any?]()
 
   /// convenience accessor for the map view
   public var mapView: W3WMapViewProtocol?
@@ -57,8 +57,7 @@ open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProto
 
   /// sets a map view for this view controller
   open func set(mapView: W3WMapViewProtocol) {
-    let mapCamera = self.mapView?.getCameraState()
-    print(self.mapView is W3WOldAppleMapView ? "🗺️ apple" : "🗺️ google", mapCamera?.description ?? "?")
+    let mapCamera = self.mapView?.getCameraState() ?? mapView.getCameraState()
     
     // transfer the viewModel from the current view to the new one
     if let oldVm = self.mapView?.viewModel {
@@ -85,9 +84,9 @@ open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProto
       view.sendSubviewToBack(mapView)
     }
     
-    if let camera = mapCamera {
-      mapView.viewModel.mapState.camera.send(camera)
-    }
+    //if let camera = mapCamera {
+      mapView.viewModel.mapState.camera.send(mapCamera)
+    //}
   }
   
   
