@@ -10,25 +10,31 @@ import W3WSwiftCore
 
 // a fake API injected that returns squares that the iOS simulator will show
 class MockApi: W3WProtocolV4 {
-  let twas = ["index.home.raft", "daring.lion.race", "oval.blast.improving", "form.monkey.employ"]
+  
+  var square: W3WSquare = W3WBaseSquare(words: "index.home.raft", country : W3WBaseCountry(code: "GB"), nearestPlace : "Bayswater, UK", distanceToFocus : W3WBaseDistance(kilometers: 1.0), language : W3WBaseLanguage(code:"en"), coordinates: CLLocationCoordinate2D(latitude: 51.50998, longitude: -0.1337))
   
   var index = 0
   
   let english = W3WBaseLanguage(code: "en", name: "English", nativeName: "English")
   
+  
+  init(square: W3WSquare? = nil) {
+    if let s = square {
+      self.square = s
+    }
+  }
+  
+  
   func convertToCoordinates(words: String, completion: @escaping W3WSquareResponse) {
-    incrementIndex()
-    completion(makeSquare(text: words), nil)
+    completion(square, nil)
   }
   
   func convertTo3wa(coordinates: CLLocationCoordinate2D, language: W3WSwiftCore.W3WLanguage, completion: @escaping W3WSwiftCore.W3WSquareResponse) {
-    incrementIndex()
-    completion(makeSquare(), nil)
+    completion(square, nil)
   }
 
   func autosuggest(text: String, options: [W3WSwiftCore.W3WOption]?, completion: @escaping W3WSwiftCore.W3WSuggestionsResponse) {
-    incrementIndex()
-    completion([makeSquare(text: text)], nil)
+    completion([square], nil)
   }
 
   func autosuggestWithCoordinates(text: String, options: [W3WSwiftCore.W3WOption]?, completion: @escaping W3WSwiftCore.W3WSquaresResponse) {
@@ -55,39 +61,39 @@ class MockApi: W3WProtocolV4 {
   // MARK: Util
   
   
-  func incrementIndex() {
-    index += 1
-    if index >= twas.count {
-      index = 0
-    }
-  }
+//  func incrementIndex() {
+//    index += 1
+//    if index >= twas.count {
+//      index = 0
+//    }
+//  }
   
 
   // make a square with a likely match
-  func makeSquare(text: String? = nil) -> W3WBaseSquare {
-    return W3WBaseSquare(
-      words: makeWords(text: text),
-      country : W3WBaseCountry(code: "GB"),
-      nearestPlace : "Bayswater, UK",
-      distanceToFocus : W3WBaseDistance(kilometers: 1.0),
-      language : W3WBaseLanguage(code:"en"),
-      coordinates: CLLocationCoordinate2D(latitude: 51.50998, longitude: -0.1337)
-    )
-  }
+//  func makeSquare(text: String? = nil) -> W3WBaseSquare {
+//    return W3WBaseSquare(
+//      words: twa,
+//      country : W3WBaseCountry(code: "GB"),
+//      nearestPlace : "Bayswater, UK",
+//      distanceToFocus : W3WBaseDistance(kilometers: 1.0),
+//      language : W3WBaseLanguage(code:"en"),
+//      coordinates: CLLocationCoordinate2D(latitude: 51.50998, longitude: -0.1337)
+//    )
+//  }
 
   
   // get a three word address that is the same length as the imput
-  func makeWords(text: String?) -> String {
-    if let t = text {
-      for twa in twas {
-        if twa.count == t.count {
-          return twa
-        }
-      }
-    }
-
-    return twas[index]
-  }
+//  func makeWords(text: String?) -> String {
+//    if let t = text {
+//      for twa in twas {
+//        if twa.count == t.count {
+//          return twa
+//        }
+//      }
+//    }
+//
+//    return twas[index]
+//  }
   
   
 }

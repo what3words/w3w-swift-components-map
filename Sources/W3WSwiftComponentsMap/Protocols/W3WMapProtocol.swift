@@ -18,15 +18,10 @@ public protocol W3WMapProtocol {
   /// to resolve words into coords and vice versa
   var w3w: W3WProtocolV4 { get set }
   
-  // returns the error enum for any error that occurs
+  /// returns the error enum for any error that occurs
   var onError: W3WErrorResponse { get set }
 
-  // set the actual map view to use
-  //func set(mapView: W3WMapStateProtocol)
-  
-  // set the language to use for three word addresses when they need to be looked up
-  //func set(language: W3WLanguage)
-  
+  /// the object that holds info about what is on the map
   func set(state: W3WMapStateProtocol)
   
   // put a what3words annotation on the map showing the address
@@ -78,11 +73,6 @@ public protocol W3WMapProtocol {
   func set(zoom: W3WMapScale)
   func set(pointsPerMeter: Double)
   func set(googleZoom: Float)
-
-  // zoom related getter functions
-  //func getZoom() -> W3WMapScale
-  //func getViewBoundaries() -> W3WBox
-  //func set(viewBoundaries: W3WBox)
 }
 
 
@@ -98,6 +88,8 @@ public extension W3WMapProtocol {
       }
       state.markers.value.add(square: square, listName: group)
       state.markers.send(state.markers.value)
+      
+      set(center: square.coordinates, camera: camera)
     }
   }
   
@@ -105,6 +97,7 @@ public extension W3WMapProtocol {
   func addMarker(at words: String?, camera: W3WCameraMovement = .none, color: W3WColor? = nil, group: String? = nil) {
     if let words = words {
       w3w.convertToCoordinates(words: words) { square, error in
+        sendErrorIfAny(error: error)
         addMarker(at: square, camera: camera, color: color, group: group)
       }
     }
@@ -114,6 +107,7 @@ public extension W3WMapProtocol {
   func addMarker(at coordinates: CLLocationCoordinate2D?, language: W3WLanguage, camera: W3WCameraMovement = .none, color: W3WColor? = nil, group: String? = nil) {
     if let coordinates = coordinates {
       w3w.convertTo3wa(coordinates: coordinates, language: language) { square, error in
+        sendErrorIfAny(error: error)
         addMarker(at: square, camera: camera, color: color, group: group)
       }
     }
@@ -240,6 +234,7 @@ public extension W3WMapProtocol {
   func set(center: W3WSuggestion?) {
     if let words = center?.words {
       w3w.convertToCoordinates(words: words) { square, error in
+        sendErrorIfAny(error: error)
         set(center: square)
       }
     }
@@ -249,18 +244,35 @@ public extension W3WMapProtocol {
   func set(center: String?) {
     if let words = center {
       w3w.convertToCoordinates(words: words) { square, error in
+        sendErrorIfAny(error: error)
         set(center: square)
       }
     }
   }
  
-
+  
   func set(center: CLLocationCoordinate2D?) {
-    state.camera.send(W3WMapCamera(center: center))
+    set(center: center, camera: .center)
   }
- 
 
-  func set(defaultZoom: W3WPointsPerSquare) {
+
+  func set(center: CLLocationCoordinate2D?, camera: W3WCameraMovement = .center) {
+    switch camera {
+
+      case .center:
+        state.camera.send(W3WMapCamera(center: center))
+
+      case .zoom:
+        state.camera.send(W3WMapCamera(center: center, scale: .standardZoom))
+
+      default:
+        break
+    }
+  }
+    
+
+  func set(defaultZoom: W3WMapScale) {
+    W3WMapScale.standardZoom = defaultZoom
   }
   
 
@@ -278,8 +290,15 @@ public extension W3WMapProtocol {
     set(zoom: W3WMapScale(googleZoom: googleZoom))
   }
 
+
+  /// checks if there is an error and if so, sends it using the error callback
+  fileprivate func sendErrorIfAny(error: W3WError?) {
+    if let e = error {
+      onError(e)
+    }
+  }
   
-//  func getZoom() -> W3WMapScale {
+  //  func getZoom() -> W3WMapScale {
 //    return 0.0
 //  }
 //  

@@ -12,7 +12,7 @@ import W3WSwiftThemes
 
 public class W3WMarkersLists: CustomStringConvertible {
   
-  var lists: [String: W3WMarkerList]
+  public var lists: [String: W3WMarkerList]
   
   var defaultColour: W3WColor
 
