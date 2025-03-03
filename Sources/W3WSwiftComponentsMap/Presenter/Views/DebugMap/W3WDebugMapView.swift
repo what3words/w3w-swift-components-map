@@ -84,16 +84,16 @@ public class W3WDebugMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
   
   
   func bind() {
-    subscribe(to: viewModel.mapState.selected) { [weak self] square in
+    subscribe(to: viewModel.input.selected) { [weak self] square in
       self?.handle(selected: square)
     }
-    subscribe(to: viewModel.mapState.markers) { [weak self] markers in
+    subscribe(to: viewModel.input.markers) { [weak self] markers in
       self?.handle(markers: markers)
     }
-    subscribe(to: viewModel.mapState.hovered) { [weak self] square in
+    subscribe(to: viewModel.input.hovered) { [weak self] square in
       self?.handle(hovered: square)
     }
-    subscribe(to: viewModel.mapState.camera) { [weak self] camera in
+    subscribe(to: viewModel.input.camera) { [weak self] camera in
       self?.handle(mapCamera: camera)
     }
     //subscribe(to: viewModel.mapState.scheme) { [weak self] scheme in

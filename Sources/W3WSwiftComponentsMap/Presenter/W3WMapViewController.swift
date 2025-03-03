@@ -91,7 +91,7 @@ open class W3WMapViewController: W3WViewController, W3WEventSubscriberProtocol {
     }
     
     //if let camera = mapCamera {
-      mapView.viewModel.mapState.camera.send(mapCamera)
+      mapView.viewModel.input.camera.send(mapCamera)
     //}
   }
   

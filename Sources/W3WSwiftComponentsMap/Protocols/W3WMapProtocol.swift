@@ -83,9 +83,12 @@ public extension W3WMapProtocol {
     
   func addMarker(at square: W3WSquare?, camera: W3WCameraMovement = .none, color: W3WColor? = nil, group: String? = nil) {
     if let square = square {
-      if let listName = group, state.markers.value.lists[listName] == nil {
+      let listName = (group ?? Self.defautGroupName)
+      
+      if state.markers.value.lists[listName] == nil {
         state.markers.value.add(listName: listName, list: W3WMarkerList(color: color))
       }
+      
       state.markers.value.add(square: square, listName: group)
       state.markers.send(state.markers.value)
       

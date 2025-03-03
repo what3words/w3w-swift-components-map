@@ -63,8 +63,11 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
     bind()
     attachTapRecognizer()
     attachHoverRecognizer()
+    
+//    show(route: directions.route)
   }
   
+//  lazy var directions = W3WDirections(w3w: viewModel.w3w, from: "index.home.raft", to: "filled.count.soap")
   
   //  public func set(type: W3WMapType) {
   //    set(type: type.value)
@@ -72,9 +75,9 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   
   
   func bind() {
-    subscribe(to: viewModel.mapState.camera) { [weak self] camera in self?.handle(mapCamera: camera) }
-    subscribe(to: viewModel.mapState.markers) { [weak self] markers in self?.handle(markers: markers) }
-    subscribe(to: viewModel.mapState.selected) { [weak self] selected in self?.handle(selected: selected) }
+    subscribe(to: viewModel.input.camera) { [weak self] camera in self?.handle(mapCamera: camera) }
+    subscribe(to: viewModel.input.markers) { [weak self] markers in self?.handle(markers: markers) }
+    subscribe(to: viewModel.input.selected) { [weak self] selected in self?.handle(selected: selected) }
   }
   
   
@@ -100,6 +103,16 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
   }
   
   
+//  func show(route: W3WLive<[MKRoute]>?) {
+//    subscribe(to: route) { [weak self] routes in
+//      for route in routes {
+//        self?.mapView.addOverlay(route.polyline)
+//        self?.mapView.setVisibleMapRect(route.polyline.boundingMapRect, edgePadding: UIEdgeInsets.init(top: 80.0, left: 20.0, bottom: 100.0, right: 20.0), animated: true)
+//      }
+//    }
+//  }
+  
+  
   func attachHoverRecognizer() {
     //let hoverGesture = UIHoverGestureRecognizer(target: self, action: #selector(onHover(_:)))
     //mapView.addGestureRecognizer(hoverGesture)
@@ -116,7 +129,7 @@ public class W3WOldAppleMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriber
     let location = gestureRecognizer.location(in: mapView)
     let coordinates = mapView.convert(location, toCoordinateFrom: mapView)
 
-    viewModel.w3w.convertTo3wa(coordinates: coordinates, language: viewModel.mapState.language.value ?? W3WBaseLanguage.english) { [weak self] square, error in
+    viewModel.w3w.convertTo3wa(coordinates: coordinates, language: viewModel.input.language.value ?? W3WBaseLanguage.english) { [weak self] square, error in
       if let e = error {
         W3WThread.runOnMain {
           //self?.error?.send(e)
