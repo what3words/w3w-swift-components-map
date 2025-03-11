@@ -13,9 +13,7 @@ public protocol W3WMapViewModelProtocol {
   
   var gps: W3WLive<W3WSquare?> { get set }
 
-  var mapState: W3WMapStateProtocol { get set }
- 
-  var input: W3WEvent<W3WMapInputEvent> { get set }
+  var input: W3WMapStateProtocol { get set }
 
   var output: W3WEvent<W3WMapOutputEvent> { get set }
 

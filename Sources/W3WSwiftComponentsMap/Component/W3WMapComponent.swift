@@ -32,8 +32,8 @@ open class W3WMapComponent: W3WMapViewController, W3WMapProtocol {
 
   
   public var state: any W3WMapStateProtocol {
-    get { return viewModel.mapState }
-    set { viewModel.mapState = newValue; bind() }
+    get { return viewModel.input }
+    set { viewModel.input = newValue; bind() }
   }
   
 
@@ -82,7 +82,7 @@ open class W3WMapComponent: W3WMapViewController, W3WMapProtocol {
   
   
   public func set(language: W3WLanguage) {
-    viewModel.mapState.language.send(language)
+    viewModel.input.language.send(language)
   }
   
   

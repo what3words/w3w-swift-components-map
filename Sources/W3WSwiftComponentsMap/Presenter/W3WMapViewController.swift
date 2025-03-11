@@ -54,6 +54,12 @@ open class W3WMapViewController: W3WViewController, W3WEventSubscriberProtocol {
     return mapView?.getType() ?? "Unknown"
   }
 
+  
+  /// gets the map scale
+  public func getMapScale() -> W3WMapScale? {
+    return mapView?.getCameraState().scale
+  }
+
 
   /// sets a map view for this view controller
   open func set(mapView: W3WMapViewProtocol) {
@@ -85,7 +91,7 @@ open class W3WMapViewController: W3WViewController, W3WEventSubscriberProtocol {
     }
     
     //if let camera = mapCamera {
-      mapView.viewModel.mapState.camera.send(mapCamera)
+      mapView.viewModel.input.camera.send(mapCamera)
     //}
   }
   

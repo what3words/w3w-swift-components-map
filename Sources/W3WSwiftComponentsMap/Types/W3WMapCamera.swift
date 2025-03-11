@@ -40,12 +40,18 @@ public struct W3WMapCamera: Equatable, CustomStringConvertible {
   }
   
   
-//  public func googleZoom() -> Float {
-//    let zoom = Float(12.0)
-//    // math math
-//    ///math(scale)
-//    return zoom
-//  }
+  public func contains(coordinates: CLLocationCoordinate2D?, mapSize: CGSize) -> Bool {
+    if let coords = coordinates, let point = center {
+      if let span = scale?.asSpan(mapSize: mapSize, latitude: coords.latitude) {
+        if coords.longitude < point.longitude + span.longitudeDelta && coords.longitude > point.longitude - span.longitudeDelta {
+          if coords.latitude < point.latitude + span.latitudeDelta && coords.latitude > point.latitude - span.latitudeDelta {
+            return true
+          }
+        }
+      }
+    }
+    return false
+  }
   
   
   public var description: String {
