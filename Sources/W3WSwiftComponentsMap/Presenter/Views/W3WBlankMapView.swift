@@ -29,7 +29,7 @@ public class W3WBlankMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
     
     super.init(scheme: .standard.with(background: .powderBlue))
     
-    subscribe(to: viewModel.mapState.camera) { [weak self] camera in
+    subscribe(to: viewModel.input.camera) { [weak self] camera in
       if let camera = camera {
         self?.camera = camera
       }
@@ -50,7 +50,7 @@ public class W3WBlankMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
   public func getCameraState() -> W3WMapCamera {
     //return self.camera
     let coords = CLLocationCoordinate2D(latitude: 51.520847000000003, longitude: -0.195521)
-    return W3WMapCamera(center: coords, scale: W3WMapScale(pointsPerMeter: 4.0))
+    return W3WMapCamera(center: coords, scale: .standardZoom)
   }
   
   
@@ -64,7 +64,7 @@ public class W3WBlankMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
     viewModel.w3w.convertToCoordinates(words: "filled.count.soap") { [weak self] square, error in
       if let square = square {
         self?.viewModel.output.send(.selected(square))
-        self?.viewModel.output.send(.camera(W3WMapCamera(scale: W3WMapScale(pointsPerMeter: 4.0))))
+        self?.viewModel.output.send(.camera(W3WMapCamera(scale: .standardZoom)))
       }
     }
   }
