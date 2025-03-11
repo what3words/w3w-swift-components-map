@@ -6,6 +6,7 @@
 //
 
 import W3WSwiftCore
+import CoreLocation
 
 public protocol W3WMapViewModelProtocol {
   
@@ -17,4 +18,7 @@ public protocol W3WMapViewModelProtocol {
 
   var output: W3WEvent<W3WMapOutputEvent> { get set }
 
+  func selectSquare(with coordinates: CLLocationCoordinate2D)
+  
+  func updateCameraPosition(with camera: W3WMapCamera)
 }

@@ -30,5 +30,20 @@ open class W3WMapViewModel: W3WMapViewModelProtocol, W3WEventSubscriberProtocol 
     self.gps = gps
   }
   
+  public func selectSquare(with coordinates: CLLocationCoordinate2D) {
+    if let language = mapState.language.value {
+      w3w.convertTo3wa(coordinates: coordinates, language: language) { [weak self] square, err in
+        if let square {
+          self?.output.send(.selected(square))
+        }
+        if let err {
+          self?.onError(err)
+        }
+      }
+    }
+  }
   
+  public func updateCameraPosition(with camera: W3WMapCamera) {
+    output.send(.camera(camera))
+  }
 }
