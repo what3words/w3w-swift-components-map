@@ -105,5 +105,27 @@ public class W3WMarkersLists: CustomStringConvertible {
     
     return retval
   }
+  
+  /// Returns a dictionary of all marker lists indexed by their names.
+  ///
+  /// Use this method to access all marker lists stored in the W3WMarkersLists instance.
+  /// Each list contains markers and associated settings like color.
+  ///
+  /// - Returns: A dictionary where the key is the list name (String) and the value is the corresponding W3WMarkerList.
+  ///           The dictionary includes the default list with key "default" if no other lists were added.
+  ///
+  /// - Example:
+  ///   ```
+  ///   let markerLists = W3WMarkersLists()
+  ///   let allLists = markerLists.getLists()
+  ///
+  ///   // Access the default list
+  ///   if let defaultList = allLists["default"] {
+  ///       // Work with default list markers
+  ///   }
+  ///   ```
+  public func getLists() -> [String: W3WMarkerList] {
+    return lists
+  }
 
 }
