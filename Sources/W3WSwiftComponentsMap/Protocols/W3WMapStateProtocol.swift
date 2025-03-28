@@ -35,4 +35,12 @@ public extension W3WMapStateProtocol {
     //self.camera.send(state.camera.value)
   }
   
+  
+  func send() {
+    hovered.send(hovered.value)
+    selected.send(selected.value)
+    markers.send(markers.value)
+    language.send(language.value)
+  }
+  
 }

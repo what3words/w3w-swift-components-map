@@ -44,10 +44,10 @@ open class W3WMapComponent: W3WMapViewController, W3WMapProtocol {
   }
   
   
-  public init(w3w: W3WProtocolV4, language: W3WLanguage = W3WBaseLanguage.english) {
+  public init(w3w: W3WProtocolV4, language: W3WLanguage = W3WBaseLanguage(code: "en")) {
     let mapState = W3WMapState(language: W3WLive<W3WLanguage?>(language))
     viewModel = W3WMapViewModel(mapState: mapState, w3w: w3w)
-    let view = W3WOldAppleMapView(viewModel: viewModel)
+    let view = W3WBlankMapView(viewModel: viewModel)
     super.init(view: view)
 
     bind()
@@ -57,7 +57,7 @@ open class W3WMapComponent: W3WMapViewController, W3WMapProtocol {
   required public init?(coder: NSCoder) {
     let mapState = W3WMapState(language: W3WLive<W3WLanguage?>(W3WBaseLanguage(code: "en")))
     viewModel = W3WMapViewModel(mapState: mapState, w3w: W3WDummyApi()) // instantiate with a fake API, and set the real one after to get around a catch-22
-    let view = W3WOldAppleMapView(viewModel: viewModel)
+    let view = W3WBlankMapView(viewModel: viewModel)
     super.init(view: view)
 
     bind()
