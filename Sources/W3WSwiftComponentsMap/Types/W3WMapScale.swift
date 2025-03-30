@@ -89,7 +89,7 @@ public struct W3WMapScale: Equatable, ExpressibleByFloatLiteral, CustomStringCon
   /// - Parameters:
   ///   - mapSize: the size of the map view in points
   ///   - latitude: the latitude of the region that the span will be
-  func asSpan(mapSize: CGSize, latitude: Double) -> MKCoordinateSpan {
+  public func asSpan(mapSize: CGSize, latitude: Double) -> MKCoordinateSpan {
     return Self.pointsPerMeterToSpan(pointsPerMeter: value, mapSize: mapSize, latitude: 0.0) // latitude)
   }
   
