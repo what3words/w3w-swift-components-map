@@ -31,7 +31,7 @@ open class W3WMapViewModel: W3WMapViewModelProtocol, W3WEventSubscriberProtocol 
   }
   
   public func selectSquare(with coordinates: CLLocationCoordinate2D) {
-    if let language = mapState.language.value {
+    if let language = input.language.value {
       w3w.convertTo3wa(coordinates: coordinates, language: language) { [weak self] square, err in
         if let square {
           self?.output.send(.selected(square))

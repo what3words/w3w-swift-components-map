@@ -17,7 +17,6 @@ let package = Package(
     .package(url: "https://github.com/what3words/w3w-swift-themes.git", "1.0.0"..<"2.0.0"),
     .package(url: "https://github.com/what3words/w3w-swift-design.git", "1.0.0"..<"2.0.0"),
     .package(url: "https://github.com/what3words/w3w-swift-core.git", "1.0.0"..<"2.0.0"),
-    .package(url: "https://github.com/what3words/w3w-swift-components.git", "3.0.0"..<"4.0.0"),
     .package(url: "git@github.com:w3w-internal/w3w-swift-app-events.git", "1.0.0"..<"2.0.0")
   ],
   
@@ -26,7 +25,6 @@ let package = Package(
       .product(name: "W3WSwiftCore", package: "w3w-swift-core"),
       .product(name: "W3WSwiftDesign", package: "w3w-swift-design"),
       .product(name: "W3WSwiftThemes", package: "w3w-swift-themes"),
-      .product(name: "W3WSwiftComponents", package: "w3w-swift-components"),
       .product(name: "W3WSwiftAppEvents", package: "w3w-swift-app-events")
     ]),
     .testTarget(name: "w3w-swift-components-mapTests", dependencies: ["W3WSwiftComponentsMap"]),
