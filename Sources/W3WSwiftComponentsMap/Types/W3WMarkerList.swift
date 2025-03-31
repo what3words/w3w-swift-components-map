@@ -15,13 +15,16 @@ public class W3WMarkerList: CustomStringConvertible {
   /// the colour of the markers in theis group
   public var color: W3WColor?
   
+  public var type: W3WMarkerType?
+  
   /// the list of squares to mark
   public var markers: [W3WSquare]
   
   
   /// a named, coloured, group of markers
-  public init(color: W3WColor? = nil, markers: [W3WSquare] = []) {
+  public init(color: W3WColor? = nil, type: W3WMarkerType? = nil, markers: [W3WSquare] = []) {
     self.color = color
+    self.type = type
     self.markers = markers
   }
   
