@@ -14,9 +14,9 @@ let package = Package(
   ],
   
   dependencies: [
-    .package(url: "https://github.com/what3words/w3w-swift-themes.git", "1.0.0"..<"2.0.0"),
-    .package(url: "https://github.com/what3words/w3w-swift-design.git", "1.0.0"..<"2.0.0"),
-    .package(url: "https://github.com/what3words/w3w-swift-core.git", "1.0.0"..<"2.0.0"),
+    .package(url: "https://github.com/what3words/w3w-swift-themes.git", branch: "staging"), // "1.0.0"..<"2.0.0"),
+    .package(url: "https://github.com/what3words/w3w-swift-design.git", branch: "staging"), // "1.0.0"..<"2.0.0"),
+    .package(url: "https://github.com/what3words/w3w-swift-core.git", branch: "staging"), // "1.0.0"..<"2.0.0"),
     .package(url: "git@github.com:w3w-internal/w3w-swift-app-events.git", "1.0.0"..<"2.0.0")
   ],
   
