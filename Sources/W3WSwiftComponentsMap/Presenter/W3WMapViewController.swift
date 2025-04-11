@@ -73,6 +73,7 @@ open class W3WMapViewController: W3WViewController, W3WEventSubscriberProtocol {
     // if there is already a map there, then fade the new one in
     if let currentMap = self.mapView {
       self.mapView = mapView
+      self.mapView?.frame = currentMap.frame
       mapView.alpha = 0.0
       self.view.insertSubview(mapView, aboveSubview: currentMap)
       UIView.animate(withDuration: W3WDuration.defaultAnimationSpeed.seconds, animations: {
