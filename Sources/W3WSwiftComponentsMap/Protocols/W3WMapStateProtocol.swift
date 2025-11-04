@@ -13,8 +13,6 @@ public protocol W3WMapStateProtocol {
 
   var language: W3WLive<W3WLanguage?> { get set }
   
-  //var scheme: W3WLive<W3WScheme?> { get set }
-  
   var markers: W3WLive<W3WMarkersLists> { get set }
   
   var selected: W3WLive<W3WSquare?> { get set }
@@ -22,8 +20,6 @@ public protocol W3WMapStateProtocol {
   var hovered: W3WLive<W3WSquare?> { get set }
 
   var camera: W3WEvent<W3WMapCamera?> { get set }
-  
-  //var error: W3WEvent<W3WError?> { get set }
 
 }
 
@@ -37,6 +33,14 @@ public extension W3WMapStateProtocol {
     self.selected.send(state.selected.value)
     self.hovered.send(state.hovered.value)
     //self.camera.send(state.camera.value)
+  }
+  
+  
+  func send() {
+    hovered.send(hovered.value)
+    selected.send(selected.value)
+    markers.send(markers.value)
+    language.send(language.value)
   }
   
 }

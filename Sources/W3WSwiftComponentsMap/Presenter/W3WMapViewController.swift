@@ -13,11 +13,11 @@ import W3WSwiftDesign
 
 
 /// Holds an interchangable map view
-open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProtocol {
+open class W3WMapViewController: W3WViewController, W3WEventSubscriberProtocol {
   public var subscriptions = W3WEventsSubscriptions()
   
   /// keeps a reference to objects to keep them alive and release them on destruction
-  var keepAlive: [Any?]
+  var keepAlive = [Any?]()
 
   /// convenience accessor for the map view
   public var mapView: W3WMapViewProtocol?
@@ -54,11 +54,16 @@ open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProto
     return mapView?.getType() ?? "Unknown"
   }
 
+  
+  /// gets the map scale
+  public func getMapScale() -> W3WMapScale? {
+    return mapView?.getCameraState().scale
+  }
+
 
   /// sets a map view for this view controller
   open func set(mapView: W3WMapViewProtocol) {
-    let mapCamera = self.mapView?.getCameraState()
-    print(self.mapView is W3WOldAppleMapView ? "🗺️ apple" : "🗺️ google", mapCamera?.description ?? "?")
+    let mapCamera = self.mapView?.getCameraState() ?? mapView.getCameraState()
     
     // transfer the viewModel from the current view to the new one
     if let oldVm = self.mapView?.viewModel {
@@ -68,6 +73,7 @@ open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProto
     // if there is already a map there, then fade the new one in
     if let currentMap = self.mapView {
       self.mapView = mapView
+      self.mapView?.frame = currentMap.frame
       mapView.alpha = 0.0
       self.view.insertSubview(mapView, aboveSubview: currentMap)
       UIView.animate(withDuration: W3WDuration.defaultAnimationSpeed.seconds, animations: {
@@ -85,9 +91,8 @@ open class W3WMultiMapViewController: W3WViewController, W3WEventSubscriberProto
       view.sendSubviewToBack(mapView)
     }
     
-    if let camera = mapCamera {
-      mapView.viewModel.mapState.camera.send(camera)
-    }
+    mapView.viewModel.input.send()
+    //mapView.viewModel.input.camera.send(mapCamera)
   }
   
   

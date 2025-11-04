@@ -10,10 +10,10 @@ import W3WSwiftCore
 import W3WSwiftThemes
 
 
-public class W3WMapViewModel: W3WMapViewModelProtocol, W3WEventSubscriberProtocol {
+open class W3WMapViewModel: W3WMapViewModelProtocol, W3WEventSubscriberProtocol {
   public var subscriptions = W3WEventsSubscriptions()
   
-  public var input = W3WEvent<W3WMapInputEvent>()
+  public var input: W3WMapStateProtocol
 
   public var output = W3WEvent<W3WMapOutputEvent>()
 
@@ -21,28 +21,29 @@ public class W3WMapViewModel: W3WMapViewModelProtocol, W3WEventSubscriberProtoco
   
   public var gps: W3WLive<W3WSquare?>
   
-  public var mapState: W3WMapStateProtocol
-
   public var onError: W3WErrorResponse = { _ in }
 
   
-  //public init(language: W3WLive<W3WLanguage?> = W3WLive<W3WLanguage?>(W3WBaseLanguage.english), w3w: W3WProtocolV4, gps: W3WLive<W3WSquare?> = W3WLive<W3WSquare?>(nil)) {
-  //  self.mapState = W3WMapState(language: language)
   public init(mapState: W3WMapStateProtocol, w3w: W3WProtocolV4, gps: W3WLive<W3WSquare?> = W3WLive<W3WSquare?>(nil)) {
-    self.mapState = mapState
+    self.input = mapState
     self.w3w = w3w
     self.gps = gps
-    
-    subscribe(to: input) { [weak self] event in
-      self?.handle(event: event)
+  }
+  
+  public func selectSquare(with coordinates: CLLocationCoordinate2D) {
+    if let language = input.language.value {
+      w3w.convertTo3wa(coordinates: coordinates, language: language) { [weak self] square, err in
+        if let square {
+          self?.output.send(.selected(square))
+        }
+        if let err {
+          self?.onError(err)
+        }
+      }
     }
   }
   
-  
-  func handle(event: W3WMapInputEvent) {
-    switch event {
-    }
+  public func updateCameraPosition(with camera: W3WMapCamera) {
+    output.send(.camera(camera))
   }
-  
-  
 }

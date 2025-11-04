@@ -10,7 +10,7 @@ import Foundation
 public struct W3WMapType: Equatable, ExpressibleByStringLiteral, CustomStringConvertible {
   public typealias StringLiteralType = String
   
-  let value: String
+  public let value: String
   var displayName: String
   
   public var description: String { get { return displayName } }
@@ -37,7 +37,6 @@ public struct W3WMapType: Equatable, ExpressibleByStringLiteral, CustomStringCon
       of: "(\\p{UppercaseLetter}\\p{LowercaseLetter}|\\p{UppercaseLetter}+(?=\\p{UppercaseLetter}))",
       with: " $1",
       options: .regularExpression
-      //range: range(of: type)
     )
     .capitalized
   }

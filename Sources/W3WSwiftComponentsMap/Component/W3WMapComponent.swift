@@ -11,7 +11,7 @@ import W3WSwiftCore
 import W3WSwiftThemes
 
 
-open class W3WMapComponent: W3WMultiMapViewController, W3WMapProtocol {
+open class W3WMapComponent: W3WMapViewController, W3WMapProtocol {
 
   var viewModel: W3WMapViewModelProtocol!
   
@@ -32,23 +32,22 @@ open class W3WMapComponent: W3WMultiMapViewController, W3WMapProtocol {
 
   
   public var state: any W3WMapStateProtocol {
-    get { return viewModel.mapState }
-    set { viewModel.mapState = newValue; bind() }
+    get { return viewModel.input }
+    set { viewModel.input = newValue; bind() }
   }
   
 
   private override init(view: W3WMapViewProtocol, theme: W3WLive<W3WTheme?>?, keepAlive: [Any?] = []) {
     super.init(view: view)
-    viewModel = view.viewModel
     
     bind()
   }
   
   
-  public init(w3w: W3WProtocolV4, language: W3WLanguage = W3WBaseLanguage.english) {
+  public init(w3w: W3WProtocolV4, language: W3WLanguage = W3WBaseLanguage(code: "en")) {
     let mapState = W3WMapState(language: W3WLive<W3WLanguage?>(language))
     viewModel = W3WMapViewModel(mapState: mapState, w3w: w3w)
-    let view = W3WOldAppleMapView(viewModel: viewModel)
+    let view = W3WBlankMapView(viewModel: viewModel)
     super.init(view: view)
 
     bind()
@@ -56,9 +55,9 @@ open class W3WMapComponent: W3WMultiMapViewController, W3WMapProtocol {
 
   
   required public init?(coder: NSCoder) {
-    let mapState = W3WMapState(language: W3WLive<W3WLanguage?>(W3WBaseLanguage.english))
+    let mapState = W3WMapState(language: W3WLive<W3WLanguage?>(W3WBaseLanguage(code: "en")))
     viewModel = W3WMapViewModel(mapState: mapState, w3w: W3WDummyApi()) // instantiate with a fake API, and set the real one after to get around a catch-22
-    let view = W3WOldAppleMapView(viewModel: viewModel)
+    let view = W3WBlankMapView(viewModel: viewModel)
     super.init(view: view)
 
     bind()
@@ -69,9 +68,6 @@ open class W3WMapComponent: W3WMultiMapViewController, W3WMapProtocol {
     subscribe(to: viewModel.output) { [weak self] event in
       self?.handle(event: event)
     }
-    //subscribe(to: viewModel.mapState.error) { [weak self] error in
-    //  self?.handle(error: error)
-    //}
   }
   
   
@@ -85,6 +81,11 @@ open class W3WMapComponent: W3WMultiMapViewController, W3WMapProtocol {
   }
   
   
+  public func set(language: W3WLanguage) {
+    viewModel.input.language.send(language)
+  }
+  
+  
   func handle(event: W3WMapOutputEvent) {
     switch event {
       case .selected(let square):
@@ -93,11 +94,8 @@ open class W3WMapComponent: W3WMultiMapViewController, W3WMapProtocol {
       case .camera:
         break
         
-      //case .marker(let square):
-      //  onMarkerSelected(square)
-        
-      //case .mapMove:
-      //  break
+      case .error(let error):
+        onError(error)
     }
   }
   
