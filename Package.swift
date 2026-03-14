@@ -15,14 +15,12 @@ let package = Package(
   
   dependencies: [
     .package(url: "https://github.com/what3words/w3w-swift-themes.git", "1.0.0"..<"2.0.0"),
-    .package(url: "https://github.com/what3words/w3w-swift-design.git", "1.0.0"..<"2.0.0"),
-    .package(url: "https://github.com/what3words/w3w-swift-core.git", "1.0.0"..<"2.0.0"),
-    .package(url: "git@github.com:w3w-internal/w3w-swift-app-events.git", "5.0.0"..<"6.0.0")
+    .package(url: "https://github.com/what3words/w3w-swift-design.git", branch: "staging"),
+    .package(url: "https://github.com/w3w-internal/w3w-swift-app-events.git", branch: "dev/v5.6.0")
   ],
   
   targets: [
     .target(name: "W3WSwiftComponentsMap", dependencies: [
-      .product(name: "W3WSwiftCore", package: "w3w-swift-core"),
       .product(name: "W3WSwiftDesign", package: "w3w-swift-design"),
       .product(name: "W3WSwiftThemes", package: "w3w-swift-themes"),
       .product(name: "W3WSwiftAppEvents", package: "w3w-swift-app-events")
