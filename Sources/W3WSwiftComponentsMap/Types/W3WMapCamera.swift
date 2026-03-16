@@ -66,6 +66,38 @@ public struct W3WMapCamera: Equatable, CustomStringConvertible {
   }
   
 
+  // MARK: Accessors
+    
+  func with(scale: W3WMapScale?) -> W3WMapCamera { return W3WMapCamera(center: center, scale: scale, angle: angle, pitch: pitch) }
+  func with(center: CLLocationCoordinate2D?) -> W3WMapCamera { return W3WMapCamera(center: center, scale: scale, angle: angle, pitch: pitch) }
+  func with(angle: W3WAngle?) -> W3WMapCamera { return W3WMapCamera(center: center, scale: scale, angle: angle, pitch: pitch) }
+  func with(pitch: W3WAngle?) -> W3WMapCamera { return W3WMapCamera(center: center, scale: scale, angle: angle, pitch: pitch) }
+
+  
+  /// given a list of squares, make a carmera struct that will show them all
+  static public func calculateCameraForList(squares: [W3WSquare], mapViewSize: CGSize) -> W3WMapCamera {
+    var camera = W3WMapCamera()
+    
+    var math = W3WAreaMath()
+    for square in squares {
+      if let coordinates = square.coordinates {
+        math.add(coordinates: coordinates)
+      }
+    }
+    let span = MKCoordinateSpan(latitudeDelta: math.getSpan().0, longitudeDelta: math.getSpan().1)
+
+    camera.center = math.getCenter()
+    camera.scale = W3WMapScale(span: span, mapSize: mapViewSize, centerLatitude: camera.center?.latitude ?? 0.0)
+    
+    if (camera.scale?.pointsPerMeter ?? 100.0) > 2.0 {
+      camera.scale = W3WMapScale(pointsPerMeter: 2.0)
+    }
+
+    return camera
+  }
+
+  
+
   
 }
 

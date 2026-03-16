@@ -69,7 +69,7 @@ final class w3w_swift_components_mapTests: XCTestCase {
     let span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
         
     let screenSize = CGSize(width: 414, height: 896)
-    let ams = W3WMapScale(span: span, mapSize: screenSize)
+    let ams = W3WMapScale(span: span, mapSize: screenSize, centerLatitude: 80.0)
     print(ams.asSpan(mapSize: screenSize, latitude: 80.0))
   }
   
@@ -77,9 +77,9 @@ final class w3w_swift_components_mapTests: XCTestCase {
   /// test google zoom conversion to points per meter and back again
   func testGoogleZoom() {
     for i in stride(from: 1.0, to: 25, by: 0.1) {
-      let zoom = W3WMapScale(googleZoom: Float(i))
-      XCTAssertEqual(zoom.googleZoom, Float(i), accuracy: 0.000001)
-      print(zoom.googleZoom, zoom.value)
+      let zoom = W3WMapScale(googleZoom: Float(i), latitude: 51.0)
+      print(zoom.asGoogleZoom(latitude: 51.0), zoom.value)
+      XCTAssertEqual(zoom.asGoogleZoom(latitude: 51.0), Float(i), accuracy: 0.000001)
     }
   }
   
@@ -88,16 +88,16 @@ final class w3w_swift_components_mapTests: XCTestCase {
     let mapView = W3WMockMapView()
     
     for i in stride(from: 17.0, to: 25.0, by: 1.0) {
-      let scale = W3WMapScale(googleZoom: Float(i))
-      print(i, scale.googleZoom, mapView.lineWidth(scale: scale))
+      let scale = W3WMapScale(googleZoom: Float(i), latitude: 51.0)
+      print(i, scale.asGoogleZoom(latitude: 51.0), mapView.lineWidth(scale: scale))
     }
 
     // we use a formula to approximate the specs in figma, this means values 19, 20, & 22 are a touch off
-    XCTAssertEqual(0.5, mapView.lineWidth(scale: W3WMapScale(googleZoom: 25)).value, accuracy: 0.001)
-    XCTAssertEqual(0.5, mapView.lineWidth(scale: W3WMapScale(googleZoom: 24)).value, accuracy: 0.001)
-    XCTAssertEqual(0.5, mapView.lineWidth(scale: W3WMapScale(googleZoom: 23)).value, accuracy: 0.001)
-    XCTAssertEqual(1.0, mapView.lineWidth(scale: W3WMapScale(googleZoom: 21)).value, accuracy: 0.001)
-    XCTAssertEqual(2.0, mapView.lineWidth(scale: W3WMapScale(googleZoom: 18)).value, accuracy: 0.001)
+    XCTAssertEqual(0.5, mapView.lineWidth(scale: W3WMapScale(googleZoom: 25, latitude: 51.0)).value, accuracy: 0.001)
+    XCTAssertEqual(0.5, mapView.lineWidth(scale: W3WMapScale(googleZoom: 24, latitude: 51.0)).value, accuracy: 0.001)
+    XCTAssertEqual(0.5, mapView.lineWidth(scale: W3WMapScale(googleZoom: 23, latitude: 51.0)).value, accuracy: 0.001)
+    XCTAssertEqual(1.0, mapView.lineWidth(scale: W3WMapScale(googleZoom: 21, latitude: 51.0)).value, accuracy: 0.001)
+    XCTAssertEqual(2.0, mapView.lineWidth(scale: W3WMapScale(googleZoom: 18, latitude: 51.0)).value, accuracy: 0.001)
   }
   
   

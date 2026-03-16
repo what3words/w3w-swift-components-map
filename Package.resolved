@@ -1,15 +1,6 @@
 {
-  "originHash" : "7de786163b9c9abbd23ba734374aca38026b7dd903ac63026cb67061b35a8ffd",
+  "originHash" : "b3d51114215e13d19a23587567ec618593b407296289ae4ea65505797fddbee1",
   "pins" : [
-    {
-      "identity" : "w3w-swift-app-events",
-      "kind" : "remoteSourceControl",
-      "location" : "git@github.com:w3w-internal/w3w-swift-app-events.git",
-      "state" : {
-        "revision" : "f9eb5e0ef166e6d056910b37e6516754a657470e",
-        "version" : "5.2.0"
-      }
-    },
     {
       "identity" : "w3w-swift-core",
       "kind" : "remoteSourceControl",

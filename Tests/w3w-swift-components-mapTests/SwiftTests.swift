@@ -26,10 +26,10 @@ class TestMapViewModel {
   @Test("Adding and removing a marker")
   func addRemoveMarker() {
     mapComponent.addMarker(at: square.words)
-    #expect(mapComponent.viewModel.mapState.markers.value.lists.first?.value.markers.first?.words == square.words)
+    #expect(mapComponent.viewModel.input.markers.value.lists.first?.value.markers.first?.words == square.words)
     
     mapComponent.removeMarker(at: square.words)
-    #expect(mapComponent.viewModel.mapState.markers.value.lists.first?.value.markers.first == nil)
+    #expect(mapComponent.viewModel.input.markers.value.lists.first?.value.markers.first == nil)
   }
   
 

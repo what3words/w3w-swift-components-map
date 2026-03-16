@@ -72,7 +72,7 @@ public protocol W3WMapProtocol {
   // zoom related setter functions, sets the size of a square after .zoom is used in a show() call
   func set(zoom: W3WMapScale)
   func set(pointsPerMeter: Double)
-  func set(googleZoom: Float)
+  func set(googleZoom: Float, latitude: Double)
 }
 
 
@@ -289,8 +289,8 @@ public extension W3WMapProtocol {
   }
   
   
-  func set(googleZoom: Float) {
-    set(zoom: W3WMapScale(googleZoom: googleZoom))
+  func set(googleZoom: Float, latitude: Double) {
+    set(zoom: W3WMapScale(googleZoom: googleZoom, latitude: latitude))
   }
 
 
