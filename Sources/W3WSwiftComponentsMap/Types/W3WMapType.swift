@@ -44,6 +44,7 @@ public struct W3WMapType: Equatable, ExpressibleByStringLiteral, CustomStringCon
   
   public static let standard:  W3WMapType = "standard"
   public static let satellite: W3WMapType = "satellite"
+  public static let terrain:   W3WMapType = "terrain"
   public static let hybrid:    W3WMapType = "hybrid"
 
 

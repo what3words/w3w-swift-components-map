@@ -120,7 +120,7 @@ public class W3WDebugMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
   }
  
   
-  public func set(type: String) {
+  public func set(type: W3WMapType) {
     self.mapKind.attributedText = ("Map type: ".w3w.style(color: .mediumGrey) + W3WString(type.description)).asAttributedString()
     mapView.mapType = .mutedStandard
   }

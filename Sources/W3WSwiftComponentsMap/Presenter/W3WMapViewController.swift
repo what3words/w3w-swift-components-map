@@ -64,6 +64,7 @@ open class W3WMapViewController: W3WViewController, W3WEventSubscriberProtocol {
   /// sets a map view for this view controller
   open func set(mapView: W3WMapViewProtocol) {
     let mapCamera = self.mapView?.getCameraState() ?? mapView.getCameraState()
+    let mapType   = self.mapView?.getType()
     
     // transfer the viewModel from the current view to the new one
     if let oldVm = self.mapView?.viewModel {
@@ -93,6 +94,7 @@ open class W3WMapViewController: W3WViewController, W3WEventSubscriberProtocol {
     
     mapView.viewModel.input.send()
     mapView.viewModel.input.camera.send(mapCamera)
+    mapView.set(type: mapType ?? .standard)
   }
   
   

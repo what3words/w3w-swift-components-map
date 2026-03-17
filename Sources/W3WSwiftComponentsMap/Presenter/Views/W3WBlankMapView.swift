@@ -54,7 +54,12 @@ public class W3WBlankMapView: W3WView, W3WMapViewProtocol, W3WEventSubscriberPro
   }
   
   
-  public func set(type: String) {
+  public func set(type: W3WMapType) {
+  }
+  
+  
+  public func getType() -> W3WMapType {
+    return .standard
   }
   
   
