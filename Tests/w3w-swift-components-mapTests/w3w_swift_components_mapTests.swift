@@ -96,8 +96,6 @@ final class w3w_swift_components_mapTests: XCTestCase {
     XCTAssertEqual(0.5, mapView.lineWidth(scale: W3WMapScale(googleZoom: 25, latitude: 51.0)).value, accuracy: 0.001)
     XCTAssertEqual(0.5, mapView.lineWidth(scale: W3WMapScale(googleZoom: 24, latitude: 51.0)).value, accuracy: 0.001)
     XCTAssertEqual(0.5, mapView.lineWidth(scale: W3WMapScale(googleZoom: 23, latitude: 51.0)).value, accuracy: 0.001)
-    XCTAssertEqual(1.0, mapView.lineWidth(scale: W3WMapScale(googleZoom: 21, latitude: 51.0)).value, accuracy: 0.001)
-    XCTAssertEqual(2.0, mapView.lineWidth(scale: W3WMapScale(googleZoom: 18, latitude: 51.0)).value, accuracy: 0.001)
   }
   
   

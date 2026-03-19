@@ -12,9 +12,10 @@ import Foundation
 
 public class W3WMarkerList: CustomStringConvertible {
   
-  /// the colour of the markers in theis group
+  /// the colour of the markers in this group
   public var color: W3WColor?
-  
+
+  /// the type of marker (circle, sqaure, etc
   public var type: W3WMarkerType?
   
   /// the list of squares to mark
@@ -34,6 +35,54 @@ public class W3WMarkerList: CustomStringConvertible {
   }
   
   
+  static func + (left: W3WMarkerList, right: W3WMarkerList) -> W3WMarkerList {
+    return W3WMarkerList(color: left.color, type: left.type, markers: left.markers + right.markers)
+  }
+  
+
+  /// make a deep copy of the list
+  public func copy() -> W3WMarkerList {
+    return W3WMarkerList(color: self.color, type: self.type, markers: self.markers.map { $0 })
+  }
+  
+  
+  public func findMissing(from: W3WMarkerList) -> [W3WMapMarker] {
+    // Build a set of IDs from the 'from' list for fast lookup
+    let fromIDs: Set<Int64> = Set(from.markers.compactMap { $0.bounds?.id })
+    
+    // Return all squares in self that do not exist in the 'from' list
+    let missing = markers.filter { square in
+      guard let id = square.bounds?.id else { return false }
+      return fromIDs.contains(id) == false
+    }
+    
+    return missing.map { [weak self] square in return W3WMapMarker(square: square, color: self?.color ?? W3WPresetMarkers.defaultMarkerColor, type: self?.type ?? W3WPresetMarkers.defaultMarkerType) }
+  }
+  
+  
+  public func findAllOccurancesOf(square: W3WSquare) -> W3WMarkerList? {
+    var list = W3WMarkerList()
+    list.color = color
+    list.type = type
+    
+    var found = false
+    for s in markers {
+      if let sBoundsId = s.bounds?.id, let squareBoundsId = square.bounds?.id {
+        if sBoundsId == squareBoundsId {
+          list.markers.append(s)
+          found = true
+        }
+      }
+    }
+    
+    if found {
+      return list
+    } else {
+      return nil
+    }
+  }
+
+  
   /// as a string
   public var description: String {
     var retval = ""
@@ -51,3 +100,4 @@ public class W3WMarkerList: CustomStringConvertible {
 
   
 }
+

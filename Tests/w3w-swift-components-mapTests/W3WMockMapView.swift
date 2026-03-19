@@ -26,9 +26,14 @@ class W3WMockMapView: UIView, W3WMapViewProtocol {
   func set(viewModel: any W3WSwiftComponentsMap.W3WMapViewModelProtocol) {
   }
   
-  func set(type: String) {
+  func set(type: W3WMapType) {
   }
   
+  func getType() -> W3WMapType {
+    .standard
+  }
+  
+
   func set(scheme: W3WScheme?) {
   }
   
