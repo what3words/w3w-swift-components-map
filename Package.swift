@@ -15,8 +15,8 @@ let package = Package(
   
   dependencies: [
     .package(url: "https://github.com/what3words/w3w-swift-themes.git", "1.0.0"..<"2.0.0"),
-    .package(url: "https://github.com/what3words/w3w-swift-design.git", branch: "staging"),
-    .package(url: "https://github.com/w3w-internal/w3w-swift-app-events.git", branch: "dev/v5.6.0")
+    .package(url: "https://github.com/what3words/w3w-swift-design.git", "1.3.0"..<"2.0.0"),
+    .package(url: "https://github.com/w3w-internal/w3w-swift-app-events.git", "5.3.0"..<"6.0.0")
   ],
   
   targets: [
