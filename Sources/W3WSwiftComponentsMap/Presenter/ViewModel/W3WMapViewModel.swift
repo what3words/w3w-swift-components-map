@@ -8,7 +8,7 @@
 import CoreLocation
 import W3WSwiftCore
 import W3WSwiftThemes
-
+import Combine
 
 open class W3WMapViewModel: W3WMapViewModelProtocol, W3WEventSubscriberProtocol {
   public var subscriptions = W3WEventsSubscriptions()
@@ -31,7 +31,8 @@ open class W3WMapViewModel: W3WMapViewModelProtocol, W3WEventSubscriberProtocol 
   }
   
   public func selectSquare(with coordinates: CLLocationCoordinate2D) {
-    if let language = input.language.value {
+    // TODO: (Kaley) Recheck this
+    if let language = input.rfcLanguage.value?.toW3wLanguage() {
       w3w.convertTo3wa(coordinates: coordinates, language: language) { [weak self] square, err in
         if let square {
           self?.output.send(.selected(square))

@@ -44,8 +44,8 @@ open class W3WMapComponent: W3WMapViewController, W3WMapProtocol {
   }
   
   
-  public init(w3w: W3WProtocolV4, language: W3WLanguage = W3WBaseLanguage(code: "en")) {
-    let mapState = W3WMapState(language: W3WLive<W3WLanguage?>(language))
+  public init(w3w: W3WProtocolV4, rfcLanguage: any W3WRfcLanguageProtocol = W3WRfcLanguage.default) {
+    let mapState = W3WMapState(rfcLanguage: W3WLive<(any W3WRfcLanguageProtocol)?>(rfcLanguage))
     viewModel = W3WMapViewModel(mapState: mapState, w3w: w3w)
     let view = W3WBlankMapView(viewModel: viewModel)
     super.init(view: view)
@@ -55,7 +55,7 @@ open class W3WMapComponent: W3WMapViewController, W3WMapProtocol {
 
   
   required public init?(coder: NSCoder) {
-    let mapState = W3WMapState(language: W3WLive<W3WLanguage?>(W3WBaseLanguage(code: "en")))
+    let mapState = W3WMapState(rfcLanguage: W3WLive<(any W3WRfcLanguageProtocol)?>(W3WRfcLanguage.default))
     viewModel = W3WMapViewModel(mapState: mapState, w3w: W3WDummyApi()) // instantiate with a fake API, and set the real one after to get around a catch-22
     let view = W3WBlankMapView(viewModel: viewModel)
     super.init(view: view)
@@ -81,8 +81,8 @@ open class W3WMapComponent: W3WMapViewController, W3WMapProtocol {
   }
   
   
-  public func set(language: W3WLanguage) {
-    viewModel.input.language.send(language)
+  public func set(rfcLanguage: any W3WRfcLanguageProtocol) {
+    viewModel.input.rfcLanguage.send(rfcLanguage)
   }
   
   

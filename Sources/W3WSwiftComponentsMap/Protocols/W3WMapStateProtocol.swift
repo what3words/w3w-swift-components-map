@@ -11,7 +11,7 @@ import W3WSwiftThemes
 
 public protocol W3WMapStateProtocol {
 
-  var language: W3WLive<W3WLanguage?> { get set }
+  var rfcLanguage: W3WLive<(any W3WRfcLanguageProtocol)?> { get set }
   
   var markers: W3WLive<W3WMarkersLists> { get set }
   
@@ -40,7 +40,7 @@ public extension W3WMapStateProtocol {
     hovered.send(hovered.value)
     selected.send(selected.value)
     markers.send(markers.value)
-    language.send(language.value)
+    rfcLanguage.send(rfcLanguage.value)
   }
   
 }
