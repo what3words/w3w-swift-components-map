@@ -16,7 +16,7 @@ public class W3WMapState: W3WMapStateProtocol, W3WEventSubscriberProtocol {
   public var subscriptions = W3WEventsSubscriptions()
   
   /// current langauge to use
-  public var language = W3WLive<W3WLanguage?>(W3WBaseLanguage(code: "en"))
+  public var rfcLanguage = W3WLive<(any W3WRfcLanguageProtocol)?>(W3WRfcLanguage.default)
 
   /// all the markers to show on a map
   public var markers = W3WLive<W3WMarkersLists>(W3WMarkersLists())
@@ -32,13 +32,13 @@ public class W3WMapState: W3WMapStateProtocol, W3WEventSubscriberProtocol {
 
   
   public init(
-    language: W3WLive<W3WLanguage?> = W3WLive<W3WLanguage?>(W3WBaseLanguage(code: "en")),
+    rfcLanguage: W3WLive<(any W3WRfcLanguageProtocol)?> = W3WLive<(any W3WRfcLanguageProtocol)?>(W3WRfcLanguage.default),
     markers: W3WLive<W3WMarkersLists> = W3WLive<W3WMarkersLists>(W3WMarkersLists()),
     selected: W3WLive<(any W3WSquare)?> = W3WLive<(any W3WSquare)?>(nil),
     hovered: W3WLive<(any W3WSquare)?> = W3WLive<(any W3WSquare)?>(nil),
     camera: W3WEvent<W3WMapCamera?> = W3WEvent<W3WMapCamera?>()
   ) {
-    self.language = language
+    self.rfcLanguage = rfcLanguage
     self.markers = markers
     self.selected = selected
     self.hovered = hovered

@@ -28,11 +28,11 @@ public protocol W3WMapProtocol {
   func addMarker(at square: W3WSquare?, camera: W3WCameraMovement, color: W3WColor?, group: String?)
   func addMarker(at suggestion: W3WSuggestion?, camera: W3WCameraMovement, color: W3WColor?, group: String?)
   func addMarker(at words: String?, camera: W3WCameraMovement, color: W3WColor?, group: String?)
-  func addMarker(at coordinates: CLLocationCoordinate2D?, language: W3WLanguage, camera: W3WCameraMovement, color: W3WColor?, group: String?)
+  func addMarker(at coordinates: CLLocationCoordinate2D?, rfcLanguage: any W3WRfcLanguageProtocol, camera: W3WCameraMovement, color: W3WColor?, group: String?)
   func addMarker(at squares: [W3WSquare]?, camera: W3WCameraMovement, color: W3WColor?, group: String?)
   func addMarker(at suggestions: [W3WSuggestion]?, camera: W3WCameraMovement, color: W3WColor?, group: String?)
   func addMarker(at words: [String]?, camera: W3WCameraMovement, color: W3WColor?, group: String?)
-  func addMarker(at coordinates: [CLLocationCoordinate2D]?, language: W3WLanguage, camera: W3WCameraMovement, color: W3WColor?, group: String?)
+  func addMarker(at coordinates: [CLLocationCoordinate2D]?, rfcLanguage: any W3WRfcLanguageProtocol, camera: W3WCameraMovement, color: W3WColor?, group: String?)
   
   // remove what3words annotations from the map if they are present
   func removeMarker(at suggestion: W3WSuggestion?, group: String?)
@@ -107,9 +107,10 @@ public extension W3WMapProtocol {
   }
 
 
-  func addMarker(at coordinates: CLLocationCoordinate2D?, language: W3WLanguage, camera: W3WCameraMovement = .none, color: W3WColor? = nil, group: String? = nil) {
+  func addMarker(at coordinates: CLLocationCoordinate2D?, rfcLanguage: any W3WRfcLanguageProtocol, camera: W3WCameraMovement = .none, color: W3WColor? = nil, group: String? = nil) {
     if let coordinates = coordinates {
-      w3w.convertTo3wa(coordinates: coordinates, language: language) { square, error in
+      // TODO: (Kaley) Recheck here
+      w3w.convertTo3wa(coordinates: coordinates, language: rfcLanguage.toW3wLanguage() ?? W3WBaseLanguage.english) { square, error in
         sendErrorIfAny(error: error)
         addMarker(at: square, camera: camera, color: color, group: group)
       }
@@ -143,9 +144,9 @@ public extension W3WMapProtocol {
   }
 
   
-  func addMarker(at coordinates: [CLLocationCoordinate2D]?, language: W3WLanguage, camera: W3WCameraMovement = .none, color: W3WColor? = nil, group: String? = nil) {
+  func addMarker(at coordinates: [CLLocationCoordinate2D]?, rfcLanguage: any W3WRfcLanguageProtocol, camera: W3WCameraMovement = .none, color: W3WColor? = nil, group: String? = nil) {
     for coordinate in coordinates ?? [] {
-      addMarker(at: coordinate, language: language, camera: camera, color: color, group: group)
+      addMarker(at: coordinate, rfcLanguage: rfcLanguage, camera: camera, color: color, group: group)
     }
   }
   
