@@ -7,7 +7,7 @@ let package = Package(
   // or maybe this is called: w3w-swift-presenters-map
   name: "w3w-swift-components-map",
   
-  platforms: [.iOS("16.1")],
+  platforms: [.iOS(.v13)],
   
   products: [
     .library(name: "W3WSwiftComponentsMap", targets: ["W3WSwiftComponentsMap"]),
