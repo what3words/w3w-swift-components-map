@@ -1,13 +1,13 @@
 //
-//  File.swift
-//  
+//  W3WMapProvider.swift
+//  w3w-swift-components-map
 //
-//  Created by Dave Duprey on 21/10/2024.
+//  Created by Dave Duprey on 17/04/2026.
 //
 
 import Foundation
 
-public struct W3WMapType: Equatable, ExpressibleByStringLiteral, CustomStringConvertible {
+public struct W3WMapProvider: Equatable, ExpressibleByStringLiteral, CustomStringConvertible {
   public typealias StringLiteralType = String
   
   public let value: String
@@ -42,11 +42,12 @@ public struct W3WMapType: Equatable, ExpressibleByStringLiteral, CustomStringCon
   }
 
   
-  public static let standard:  W3WMapType = "standard"
-  public static let satellite: W3WMapType = "satellite"
-  public static let terrain:   W3WMapType = "terrain"
-  public static let hybrid:    W3WMapType = "hybrid"
-
+  // NOTE:
+  //  Use pascalCase CamelCase for the entries here.  This allows typeToName(type:)
+  //  to convert to a displayable value.
+  
+  public static let google: W3WMapProvider = "google"
+  public static let apple:  W3WMapProvider = "apple"
 
 }
 

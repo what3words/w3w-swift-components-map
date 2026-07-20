@@ -21,7 +21,7 @@ public protocol W3WMapViewProtocol: UIView {
   
   func set(viewModel: W3WMapViewModelProtocol)
   
-  func set(type: String)
+  func set(type: W3WMapType)
   
   func set(scheme: W3WScheme?)
   
@@ -37,15 +37,15 @@ public protocol W3WMapViewProtocol: UIView {
 
 extension W3WMapViewProtocol {
   
-  public func set(type: W3WMapType) {
-    set(type: type.value)
-  }
+//  public func set(type: W3WMapType) {
+//    set(type: type)
+//  }
   
   
-  @available(*, deprecated, message: "REMOVE THIS, ITS JUST FOR DEBUGGING UNTIL APP MAPS CONFORM TO IT")
-  public func getType() -> W3WMapType {
-    return "unknown"
-  }
+//  @available(*, deprecated, message: "REMOVE THIS, ITS JUST FOR DEBUGGING UNTIL APP MAPS CONFORM TO IT")
+//  public func getType() -> W3WMapType {
+//    return "unknown"
+//  }
   
   
   @available(*, deprecated, message: "REMOVE THIS, ITS JUST FOR DEBUGGING UNTIL APP MAPS CONFORM TO IT")

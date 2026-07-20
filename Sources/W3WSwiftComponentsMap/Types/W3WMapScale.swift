@@ -43,7 +43,8 @@ public struct W3WMapScale: Equatable, ExpressibleByFloatLiteral, CustomStringCon
   public var pointsPerKilometer: CGFloat { get { return value / 1000.0 } }
   
   // the google zoom value for this scale
-  public var googleZoom: Float { get { return Self.pointsPerMeterToGoogleZoom(pointsPerMeter: value) } }
+  @available(*, deprecated, renamed: "asGoogleZoom(latitude:)", message: "latitude is needed for an accurate conversion")
+  public var googleZoom: Float { get { return Self.pointsPerMeterToGoogleZoom(pointsPerMeter: value, latitude: 45.0) } }
   
   
   // MARK: Innit
@@ -72,14 +73,29 @@ public struct W3WMapScale: Equatable, ExpressibleByFloatLiteral, CustomStringCon
   /// init with a google zoom value
   /// - Parameters:
   ///   - googleZoom: the google map zoom value
-  public init(googleZoom: Float) { self.value = Self.googleZoomToPixelsPerMeter(googleZoom: googleZoom) }
+  @available(*, deprecated, renamed: "init(googleZoom:latitude:)", message: "latitude is needed for an accurate conversion")
+  public init(googleZoom: Float) { self.value = Self.googleZoomToPointsPerMeter(googleZoom: googleZoom, latitude: 45.0) }
+
+  
+  /// init with a google zoom value
+  /// - Parameters:
+  ///   - googleZoom: the google map zoom value
+  public init(googleZoom: Float, latitude: Double) { self.value = Self.googleZoomToPointsPerMeter(googleZoom: googleZoom, latitude: latitude) }
 
   
   /// init with a MapKit coordiante span
   /// - Parameters:
   ///   - span: the MKMapView span value
   ///   - mapSize: the size of the map view in points
-  public init(span: MKCoordinateSpan, mapSize: CGSize) { self.value = Self.spanToPointsPerMeter(span: span, mapSize: mapSize) }
+  @available(*, deprecated, renamed: "init(span:mapSize:centerLatitude:)", message: "latitude is needed for an accurate conversion")
+  public init(span: MKCoordinateSpan, mapSize: CGSize) { self.value = Self.spanToPointsPerMeter(span: span, mapSize: mapSize, centerLatitude: 45.0) }
+
+  
+  /// init with a MapKit coordiante span
+  /// - Parameters:
+  ///   - span: the MKMapView span value
+  ///   - mapSize: the size of the map view in points
+  public init(span: MKCoordinateSpan, mapSize: CGSize, centerLatitude: CLLocationDegrees) { self.value = Self.spanToPointsPerMeter(span: span, mapSize: mapSize, centerLatitude: centerLatitude) }
   
 
   // MARK: Accessors
@@ -90,63 +106,102 @@ public struct W3WMapScale: Equatable, ExpressibleByFloatLiteral, CustomStringCon
   ///   - mapSize: the size of the map view in points
   ///   - latitude: the latitude of the region that the span will be
   public func asSpan(mapSize: CGSize, latitude: Double) -> MKCoordinateSpan {
-    return Self.pointsPerMeterToSpan(pointsPerMeter: value, mapSize: mapSize, latitude: 0.0) // latitude)
+    return Self.pointsPerMeterToSpan(pointsPerMeter: value, mapSize: mapSize, latitude: latitude)
+  }
+  
+  
+  public func asGoogleZoom(latitude: Double) -> Float {
+    return Self.pointsPerMeterToGoogleZoom(pointsPerMeter: value, latitude: latitude)
   }
   
 
   /// description
-  public var description: String { get { String("{\(value)ppm, \(googleZoom)zm}") } }
+  public var description: String { get { String("\(value)ppm") } }
   
 
   // MARK: Conversion functions
   
-  
-  /// converts a google zoom level to pixels per meter
+  /// Converts a Google Maps zoom level to Points Per Meter (ppm)
   /// - Parameters:
-  ///   - googleZoom: the google map zoom value
-  public static func googleZoomToPixelsPerMeter(googleZoom: Float) -> CGFloat {
+  ///   - googleZoom: The Google Maps zoom level (e.g., 0 for world view, 15 for streets)
+  ///   - latitude: The center latitude of the map in degrees
+  /// - Returns: The scale in points per meter (CGFloat)
+  public static func googleZoomToPointsPerMeter(googleZoom: Float, latitude: Double) -> CGFloat {
+    // Clamp latitude to standard Web Mercator limits to prevent division by zero / infinity at poles
+    let clampedLat = min(max(latitude, -85.051128), 85.051128)
+    let latRadians = clampedLat * .pi / 180.0
     
-    // Calculate points per meter
-    let pointsPerMeter = pow(2.0, googleZoom) * Self.googleTileSize / Float(earthCircumference.meters)
+    // Calculate the width of the world map in points at this zoom level
+    let pointsPerWorld = Self.googleTileSize * pow(2.0, Float(googleZoom))
     
-    return CGFloat(pointsPerMeter)
+    // Calculate the physical circumference of the Earth at this latitude
+    let metersPerWorld = earthCircumference.meters * cos(latRadians)
+    
+    return CGFloat(pointsPerWorld / Float(metersPerWorld))
+  }
+  
+  /// Converts Points Per Meter (ppm) to a Google Maps zoom level
+  /// - Parameters:
+  ///   - pointsPerMeter: Your internal agnostic scale value
+  ///   - latitude: The center latitude of the map in degrees
+  /// - Returns: The corresponding Google Maps zoom level (Float)
+  public static func pointsPerMeterToGoogleZoom(pointsPerMeter: CGFloat, latitude: Double) -> Float {
+    // Clamp latitude to standard Web Mercator limits
+    let clampedLat = min(max(Float(latitude), -85.051128), 85.051128)
+    let latRadians = clampedLat * .pi / 180.0
+    
+    // Calculate the physical circumference of the Earth at this latitude
+    let metersPerWorld = Float(earthCircumference.meters) * cos(latRadians)
+    
+    // If we know points per meter, and we know meters per world at this latitude,
+    // we can find the total points needed to represent the world.
+    let pointsPerWorld = Float(pointsPerMeter) * metersPerWorld
+    
+    // Google zoom is log base 2 of (pointsPerWorld / tileSize)
+    let zoom = log2(pointsPerWorld / googleTileSize)
+    
+    return Float(zoom)
   }
   
 
-  /// convert a pixels per meter to google zoom level
-  /// - Parameters:
-  ///   - pointsPerMeter: the number of screen points to represent one meter
-  public static func pointsPerMeterToGoogleZoom(pointsPerMeter: CGFloat) -> Float {
-    // Clamp zoom to zero if pixelsPerMeter is negative
-    if pointsPerMeter <= 0.0 {
-      return 0.0
-    }
-    
-    // Calculate zoom level
-    let zoom = log2(Float(pointsPerMeter) * Float(earthCircumference.meters) / Self.googleTileSize)
-    
-    return zoom
-  }
-  
-  
-  /// converts a MapKit span to pixels per meter
+  /// Center-based points-per-meter using span and view size.
   /// - Parameters:
   ///   - span: the MKMapView span value
   ///   - mapSize: the size of the map view in points
-  public static func spanToPointsPerMeter(span: MKCoordinateSpan, mapSize: CGSize) -> Double {
-    // Calculate the vertical distance (latitude delta to meters)
-    let latitudeDelta = span.latitudeDelta
-    let verticalMeters = (latitudeDelta / 360.0) * 2 * .pi * earthRadius.meters
-    let pointsPerMeterVertical = mapSize.height / verticalMeters
+  ///   - centerLatitude: so longitude distances can be computed correctly.
+  public static func spanToPointsPerMeter(span: MKCoordinateSpan, mapSize: CGSize, centerLatitude: CLLocationDegrees) -> CGFloat {
+    guard mapSize.width > 0, mapSize.height > 0, span.latitudeDelta > 0, span.longitudeDelta > 0 else { return W3WMapScale.standardZoom.value }
 
-    // Calculate the horizontal distance (longitude delta to meters). Longitude distance varies with latitude (cosine scaling)
-    let longitudeDelta = span.longitudeDelta
-    let latitudeForLongitudeScaling = span.latitudeDelta / 2.0 // Midpoint latitude
-    let horizontalMeters = (longitudeDelta / 360.0) * 2 * .pi * earthRadius.meters * cos(latitudeForLongitudeScaling * .pi / 180.0)
-    let pointsPerMeterHorizontal = mapSize.width / horizontalMeters
+    // More accurate WGS-84 approximations for meters per degree:
+    // Latitude (north-south)
+    let φ = centerLatitude * .pi / 180
+    let metersPerDegreeLat =
+        111_132.92
+        - 559.82 * cos(2 * φ)
+        + 1.175  * cos(4 * φ)
+        - 0.0023 * cos(6 * φ)
 
-    // Return the minimum of vertical and horizontal points per meter
-    return min(pointsPerMeterVertical, pointsPerMeterHorizontal)
+    // Longitude (east-west)
+    let metersPerDegreeLon =
+        111_412.84 * cos(φ)
+        - 93.5     * cos(3 * φ)
+        + 0.118    * cos(5 * φ)
+
+    // Degrees per screen point on each axis
+    let degPerPointLat = span.latitudeDelta / Double(mapSize.height)
+    let degPerPointLon = span.longitudeDelta / Double(mapSize.width)
+
+    // Meters per point on each axis
+    let mppVertical   = degPerPointLat * metersPerDegreeLat
+    let mppHorizontal = degPerPointLon * metersPerDegreeLon
+
+    // Convert to points-per-meter
+    let vPPM = mppVertical   > 0 ? CGFloat(1.0 / mppVertical)   : 0
+    let hPPM = mppHorizontal > 0 ? CGFloat(1.0 / mppHorizontal) : 0
+
+    // Stable single value: average axes (or pick one consistently, e.g., horizontal)
+    //return (vPPM + hPPM) / 2.0
+    return vPPM
   }
   
   
@@ -156,22 +211,31 @@ public struct W3WMapScale: Equatable, ExpressibleByFloatLiteral, CustomStringCon
   ///   - mapSize: the size of the map view in points
   ///   - latitude: the latitude of the region
   public static func pointsPerMeterToSpan(pointsPerMeter: Double, mapSize: CGSize, latitude: Double) -> MKCoordinateSpan {
-    // Vertical span (latitudeDelta)
-    let verticalMeters = mapSize.height / pointsPerMeter
-    let latitudeDelta = (verticalMeters * 360) / (2 * .pi * earthRadius.meters)
+    // Meters visible in each direction for the given points-per-meter
+    let verticalMeters = Double(mapSize.height) / pointsPerMeter
+    let horizontalMeters = Double(mapSize.width) / pointsPerMeter
 
-    // Horizontal span (longitudeDelta)
-    let horizontalMeters = mapSize.width / pointsPerMeter
-    let longitudeDelta = (horizontalMeters * 360) / (2 * .pi * earthRadius.meters * cos(latitude * .pi / 180.0))
+    // WGS‑84 meters-per-degree at center latitude (same model as spanToPointsPerMeter)
+    let φ = latitude * .pi / 180
+    let metersPerDegreeLat =
+        111_132.92
+      - 559.82 * cos(2 * φ)
+      +   1.175 * cos(4 * φ)
+      -  0.0023 * cos(6 * φ)
 
-    // make it a square with the minimum value
-    let minSpan = min(latitudeDelta, longitudeDelta)
+    let metersPerDegreeLon =
+        111_412.84 * cos(φ)
+      -     93.5 * cos(3 * φ)
+      +     0.118 * cos(5 * φ)
 
-    // Return the span
-    return MKCoordinateSpan(latitudeDelta: minSpan, longitudeDelta: minSpan)
+    // Convert meters back to degrees on each axis
+    let latitudeDelta  = verticalMeters   / metersPerDegreeLat
+    let longitudeDelta = horizontalMeters / metersPerDegreeLon
+
+    // Preserve aspect ratio: no square enforcement
+    return MKCoordinateSpan(latitudeDelta: latitudeDelta, longitudeDelta: longitudeDelta)
   }
-  
-  
+    
 
   public func squareLineThickness() -> W3WLineThickness {
     var v = 1.9623 * exp(-0.077 * (value - 1.0))
@@ -196,147 +260,4 @@ public struct W3WMapScale: Equatable, ExpressibleByFloatLiteral, CustomStringCon
     return W3WLineThickness(value: v)
   }
   
-  
 }
-
-
-
-
-
-// MARK: Old failed code
-
-
-
-//    let eastMapPoint = mapView.region.center.longitude - mapView.region.span.longitudeDelta
-//    let westMapPoint = mapView.region.center.longitude + mapView.region.span.longitudeDelta
-//
-//    let northMapPoint = mapView.region.center.latitude + mapView.region.span.latitudeDelta
-//    let southMapPoint = mapView.region.center.latitude - mapView.region.span.latitudeDelta
-//
-//    let longitudinal = W3WBaseDistance(from: mapView.region.center, to: mapView.region.center)
-//
-//    let longitudinalDistance = eastMapPoint.distance(to: westMapPoint)
-//    let latidudinalDistance = southMapPoint.distance(to: northMapPoint)
-//
-//    let shortestDistance = min(longitudinalDistance, latidudinalDistance)
-//    let shortestPoints = min(mapView.frame.width, mapView.frame.height)
-//
-//    let pointsPerMeter = shortestPoints / shortestDistance
-//
-//    return pointsPerMeter
-
-
-//    let loc1 = CLLocation(latitude: center.latitude - span.latitudeDelta * 0.5, longitude: center.longitude)
-//    let loc2 = CLLocation(latitude: center.latitude + span.latitudeDelta * 0.5, longitude: center.longitude)
-//    let loc3 = CLLocation(latitude: center.latitude, longitude: center.longitude - span.longitudeDelta * 0.5)
-//    let loc4 = CLLocation(latitude: center.latitude, longitude: center.longitude + span.longitudeDelta * 0.5)
-//
-//    let metersInLatitude = loc1.distance(from: loc2)
-//    let metersInLongitude = loc3.distance(from: loc4)
-//
-//    let px1 = mapView.convert(loc1.coordinate, toPointTo: mapView)
-//    let px2 = mapView.convert(loc2.coordinate, toPointTo: mapView)
-//    let px3 = mapView.convert(loc3.coordinate, toPointTo: mapView)
-//    let px4 = mapView.convert(loc4.coordinate, toPointTo: mapView)
-//
-//    let pixelsInLatitude  = abs(px1.y - px2.y)
-//    let pixelsInLongitude = abs(px3.x - px4.x)
-//
-//    let pixels = min(pixelsInLatitude, pixelsInLongitude)
-//    var meters = min(metersInLatitude, metersInLongitude)
-//
-//    if meters == 0 {
-//      meters = 1.0
-//    }
-//
-//    let pixelsPerMeter = pixels / meters
-//
-//    let factor = pixelsPerMeter / scale.pointsPerMeter
-//
-//    var latDelta = span.latitudeDelta * factor
-//    var lngDelta = span.longitudeDelta * factor
-//
-//    // sanity check
-//    if latDelta.isNaN || lngDelta.isNaN {
-//      latDelta = span.latitudeDelta
-//      lngDelta = span.longitudeDelta
-//    }
-//
-//    print("latitudeDelta", latDelta, "longitudeDelta", lngDelta)
-//
-//    return MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lngDelta)
-
-
-
-//// Calculate the scale denominator
-//let scaleDenominator = Float(earthCircumference.meters) / Self.googleTileSize
-//
-//// Calculate zoom level
-//let zoom = log2(Float(pixelsPerMeter) / scaleDenominator)
-//
-//return zoom
-
-// based on 591657550.500000 / 2^(level) from https://gis.stackexchange.com/questions/7430/what-ratio-scales-do-google-maps-zoom-levels-correspond-to
-//let scale = Float(pixelsPerMeter)
-//let zoom = log(591657550.5 / scale) / log(2.0)
-
-//metersPerPx = 156543.03392 * Math.cos(latLng.lat() * Math.PI / 180) / Math.pow(2, zoom)
-//let ground_resolution = (cos(latitude.degrees * pi/180) * 2 * pi * 6378137) / (256 * 2 ^ zoomLevel)
-
-//return zoom
-
-
-
-/// this HAS NOT been tested, it is here as a temporary example
-/// it needs to be rewritten carefully
-//  @available(*, deprecated, message: "this HAS NOT been tested, it is here as a temporary example")
-//  public static func spanToPointsPerMeter(span: MKCoordinateSpan, mapView: MKMapView) -> CGFloat {
-//
-//    let east  = mapView.region.center → mapView.region.span
-//    let west  = mapView.region.center ← mapView.region.span
-//    let north = mapView.region.center ↑ mapView.region.span
-//    let south = mapView.region.center ↓ mapView.region.span
-//
-//    let latitudinalDistance  = W3WBaseDistance(from: south, to: north)
-//    let longitudinalDistance = W3WBaseDistance(from: east, to: west)
-//
-//    let shortestDistance = min(longitudinalDistance.meters, latitudinalDistance.meters)
-//    let shortestPoints = min(mapView.frame.width, mapView.frame.height)
-//
-//    let pointsPerMeter = shortestPoints / shortestDistance
-//
-//    return pointsPerMeter
-//  }
-
-
-
-//  func spanToPointsPerMeter2(span: MKCoordinateSpan, mapSizeInPoints: CGSize) -> (latPointsPerMeter: Double, lonPointsPerMeter: Double) {
-//      // Earth's radius in meters
-//      let earthRadius: Double = 6_371_000.0
-//      // Calculate the vertical distance (latitudeDelta to meters)
-//      let latitudeMeters = (span.latitudeDelta / 360.0) * 2 * .pi * earthRadius
-//      let pointsPerMeterVertical = mapSizeInPoints.height / latitudeMeters
-//      // Calculate the horizontal distance (longitudeDelta to meters)
-//      // Correctly scale longitude by latitude
-//      let longitudeMeters = (span.longitudeDelta / 360.0) * 2 * .pi * earthRadius * cos((span.latitudeDelta / 2.0) * .pi / 180.0)
-//      let pointsPerMeterHorizontal = mapSizeInPoints.width / longitudeMeters
-//      return (latPointsPerMeter: pointsPerMeterVertical, lonPointsPerMeter: pointsPerMeterHorizontal)
-//  }
-
-/// this HAS NOT been tested, it is here as a temporary example
-/// it needs to be rewritten carefully
-//  @available(*, deprecated, message: "this HAS NOT been tested, it is here as a temporary example")
-//  public static func scaleToSpan(scale: W3WMapScale, mapView: MKMapView) -> MKCoordinateSpan {
-//
-//    let span = mapView.region.span
-//    let center = mapView.region.center
-//
-//    let pxWidth  = mapView.frame.width
-//    let pxHeight = mapView.frame.height
-//
-//    let metersX = pxWidth / scale.value
-//    let metersY = pxHeight / scale.value
-//
-//    var newregion = mapView.region
-//    return MKCoordinateRegion(center: center, latitudinalMeters: metersY, longitudinalMeters: metersX).span
-//  }
