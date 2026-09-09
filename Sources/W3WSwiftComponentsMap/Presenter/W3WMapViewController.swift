@@ -63,7 +63,10 @@ open class W3WMapViewController: W3WViewController, W3WEventSubscriberProtocol {
 
   /// sets a map view for this view controller
   open func set(mapView: W3WMapViewProtocol) {
-    let mapCamera = self.mapView?.getCameraState() ?? mapView.getCameraState()
+    // Only a real map swap has a camera to carry over. Falling back to the incoming view's
+    // own state republished a brand new MKMapView's default region — the whole world — into
+    // the camera event, overriding whatever the presenter had already put there.
+    let mapCamera = self.mapView?.getCameraState()
     let mapType   = self.mapView?.getType()
     
     // transfer the viewModel from the current view to the new one
@@ -93,7 +96,9 @@ open class W3WMapViewController: W3WViewController, W3WEventSubscriberProtocol {
     }
     
     mapView.viewModel.input.send()
-    mapView.viewModel.input.camera.send(mapCamera)
+    if let mapCamera {
+      mapView.viewModel.input.camera.send(mapCamera)
+    }
     mapView.set(type: mapType ?? .standard)
   }
   
